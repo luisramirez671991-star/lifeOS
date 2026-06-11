@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>LifeOS — Sistema de Vida</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0a0f1e;--c1:#0d1426;--c2:#111827;--c3:#1e2a3a;--c4:#253347;
+  --acc:#7c3aed;--acc2:#a855f7;--acc3:#6d28d9;
+  --txt:#f1f5f9;--soft:#8fa3b1;--mut:#4a5568;
+  --gr:#10b981;--rd:#f43f5e;--yw:#fbbf24;--bl:#3b82f6;--pk:#ec4899;--cy:#06b6d4;--cv:#a855f7;
+  --r10:10px;--r14:14px;--r18:18px;
+  --sh:0 4px 24px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden}
+input,select,textarea{background:var(--c3);border:1px solid var(--c4);border-radius:var(--r10);color:var(--txt);font-size:14px;padding:10px 12px;width:100%;outline:none;transition:.2s}
+input:focus,select:focus,textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(124,58,237,.15)}
+textarea{resize:vertical;min-height:80px}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+select option{background:var(--c2)}
+button{cursor:pointer;font-family:inherit;transition:.15s}
+.btn{border:none;border-radius:var(--r10);font-size:13px;font-weight:700;padding:10px 16px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.bp{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+.bg2{background:var(--gr);color:#fff}
+.br{background:var(--rd);color:#fff}
+.bs{background:var(--c3);color:var(--txt)}
+.by{background:var(--yw);color:#000}
+.bfu{width:100%;margin-top:8px}
+.bsm{font-size:11px;padding:6px 12px}
+.bxs{font-size:11px;padding:4px 8px}
+.card{background:var(--c1);border:1px solid var(--c3);border-radius:var(--r14);padding:14px;margin-bottom:10px}
+.ic{background:var(--c2);border:1px solid var(--c3);border-radius:var(--r14);padding:12px}
+.sh{display:flex;align-items:center;justify-content:space-between;margin:14px 0 8px}
+.st{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--soft)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.g4{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:480px){.g4{grid-template-columns:repeat(4,1fr)}}
+.sc{background:var(--c2);border:1px solid var(--c3);border-radius:var(--r10);padding:10px 12px}
+.sl{font-size:10px;color:var(--soft);margin-bottom:3px}
+.sv{font-size:16px;font-weight:700}
+.fl{font-size:11px;font-weight:600;color:var(--soft);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.fg{margin-bottom:10px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cg{color:var(--gr)} .cr{color:var(--rd)} .cy{color:var(--yw)} .cb{color:var(--bl)} .cp{color:var(--pk)} .cc{color:var(--cy)} .cv{color:var(--acc2)}
+/* Login */
+.lw{position:fixed;inset:0;background:linear-gradient(135deg,#0a0f1e 0%,#1a0a2e 100%);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.lbox{background:var(--c1);border:1px solid var(--c3);border-radius:var(--r18);padding:32px 28px;width:100%;max-width:360px;box-shadow:var(--sh)}
+.llogo{text-align:center;margin-bottom:24px}
+.llogo .icon{font-size:48px;display:block;margin-bottom:8px}
+.llogo h1{font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--acc2),var(--cy));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.llogo p{font-size:12px;color:var(--soft);margin-top:4px}
+.li{background:var(--c2);border:1px solid var(--c3);border-radius:var(--r10);color:var(--txt);font-size:15px;padding:13px 14px;width:100%;outline:none;margin-bottom:10px}
+.li:focus{border-color:var(--acc)}
+.lbtn{width:100%;background:linear-gradient(135deg,var(--acc),var(--acc2));border:none;border-radius:var(--r10);padding:14px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;margin-top:4px}
+/* App */
+#app{display:none;min-height:100vh;padding-bottom:72px}
+.hdr{position:sticky;top:0;z-index:100;background:var(--c1);border-bottom:1px solid var(--c3);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.hdr-left{display:flex;flex-direction:column}
+.hdr-title{font-size:16px;font-weight:800;background:linear-gradient(135deg,var(--acc2),var(--cy));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr-date{font-size:11px;color:var(--soft)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-time{font-size:18px;font-weight:700;color:var(--acc2)}
+/* Bottom nav */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--c1);border-top:1px solid var(--c3);display:flex;z-index:100;padding:4px 0 env(safe-area-inset-bottom)}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;border:none;background:none;color:var(--mut);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;gap:3px;transition:.2s}
+.bnico{font-size:20px;line-height:1}
+.bni.on{color:var(--acc2)}
+.bni.on .bnico{filter:drop-shadow(0 0 6px var(--acc2))}
+/* Pages */
+.pg{display:none;padding:14px 14px 10px;max-width:700px;margin:0 auto}
+.pg.on{display:block}
+/* Modals */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-end;justify-content:center;padding:0}
+@media(min-width:500px){.ov{align-items:center;padding:20px}}
+.mbox{background:var(--c1);border:1px solid var(--c3);border-radius:var(--r18) var(--r18) 0 0;padding:20px 18px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+@media(min-width:500px){.mbox{border-radius:var(--r18)}}
+.mt{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.mc{background:none;border:none;color:var(--soft);font-size:20px;padding:0;line-height:1}
+/* Toast */
+.toast-ct{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+.toast{background:var(--c1);border:1px solid var(--c3);border-radius:30px;padding:8px 18px;font-size:13px;font-weight:600;box-shadow:var(--sh);animation:tfade 3s ease forwards}
+@keyframes tfade{0%{opacity:0;transform:translateY(8px)}10%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0}}
+/* Hero */
+.hero{background:linear-gradient(135deg,#1a0a2e,#0d1a3a);border:1px solid var(--c3);border-radius:var(--r18);padding:20px;margin-bottom:12px;text-align:center}
+.hval{font-size:32px;font-weight:800;margin:8px 0 4px}
+.hrow{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.hi{background:rgba(255,255,255,.05);border-radius:8px;padding:6px 12px;text-align:center}
+.hilbl{font-size:9px;color:var(--soft);text-transform:uppercase;letter-spacing:.5px}
+.hival{font-size:13px;font-weight:700;margin-top:2px}
+/* Tags/chips */
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--c3);border:1px solid var(--c4);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
+.chip.on{background:var(--acc);border-color:var(--acc2);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+/* Priority badges */
+.pri{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;display:inline-block}
+.p-urgent{background:rgba(244,63,94,.2);color:#f43f5e}
+.p-high{background:rgba(251,191,36,.2);color:#fbbf24}
+.p-normal{background:rgba(59,130,246,.2);color:#3b82f6}
+.p-low{background:rgba(16,185,129,.2);color:#10b981}
+/* Category colors */
+.cat-financiero{color:#fbbf24} .cat-personal{color:#ec4899} .cat-negocio{color:#3b82f6}
+.cat-salud{color:#10b981} .cat-familia{color:#f97316} .cat-aprendizaje{color:#8b5cf6}
+/* Progress bar */
+.pbar{height:8px;background:var(--c3);border-radius:10px;overflow:hidden;margin:6px 0}
+.pbar-fill{height:100%;border-radius:10px;transition:width .6s ease}
+/* Calendar */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.cal-header{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
+.cal-dh{text-align:center;font-size:10px;font-weight:700;color:var(--soft);padding:4px}
+.cal-day{background:var(--c2);border:1px solid var(--c3);border-radius:8px;min-height:52px;padding:4px;cursor:pointer;transition:.15s;position:relative}
+.cal-day:hover{border-color:var(--acc)}
+.cal-day.today{border-color:var(--acc2);background:rgba(124,58,237,.1)}
+.cal-day.other-month{opacity:.35}
+.cal-day.selected{border-color:var(--acc2);background:rgba(124,58,237,.2)}
+.cal-day-num{font-size:12px;font-weight:700;margin-bottom:2px}
+.cal-dot{width:5px;height:5px;border-radius:50%;display:inline-block;margin:1px}
+.cal-dots{display:flex;flex-wrap:wrap;gap:1px;margin-top:2px}
+/* Kanban */
+.kanban{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:600px){.kanban{grid-template-columns:repeat(3,1fr)}}
+.kcolumn{background:var(--c2);border:1px solid var(--c3);border-radius:var(--r14);padding:10px}
+.kcol-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:4px 8px;border-radius:6px;display:inline-block}
+.ktask{background:var(--c1);border:1px solid var(--c3);border-radius:var(--r10);padding:10px;margin-bottom:6px;cursor:pointer;transition:.15s}
+.ktask:hover{border-color:var(--acc);transform:translateY(-1px)}
+.ktask-title{font-size:13px;font-weight:600;margin-bottom:5px;line-height:1.4}
+.ktask-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+/* Habits */
+.hab-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px}
+.hab-dot{width:100%;aspect-ratio:1;border-radius:4px;border:1px solid var(--c3)}
+.hab-dot.done{border-color:transparent}
+.hab-dot.today-dot{border-color:var(--acc2)}
+/* Goal */
+.goal-card{background:var(--c1);border:1px solid var(--c3);border-radius:var(--r14);padding:14px;margin-bottom:10px;cursor:pointer;transition:.15s}
+.goal-card:hover{border-color:var(--acc)}
+.goal-card.active{border-color:var(--acc2)}
+/* Event dot calendar */
+.ev-pill{background:var(--acc3);border-radius:4px;font-size:9px;padding:1px 4px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+/* Day event list */
+.ev-item{background:var(--c2);border-left:3px solid var(--acc2);border-radius:0 var(--r10) var(--r10) 0;padding:8px 12px;margin-bottom:6px}
+.ev-time{font-size:11px;color:var(--soft);font-weight:600}
+.ev-title{font-size:13px;font-weight:700;margin-top:2px}
+/* Mood */
+.mood-btn{font-size:24px;background:var(--c3);border:2px solid transparent;border-radius:10px;padding:8px;transition:.15s}
+.mood-btn.sel{border-color:var(--acc2);background:rgba(124,58,237,.15);transform:scale(1.1)}
+/* Streak */
+.streak-badge{background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:#fff;display:inline-flex;align-items:center;gap:4px}
+/* Step/milestone */
+.step-item{display:flex;align-items:flex-start;gap:8px;padding:8px;background:var(--c2);border-radius:8px;margin-bottom:4px}
+.step-cb{width:18px;height:18px;border-radius:4px;border:2px solid var(--c4);background:none;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.step-cb.done{background:var(--gr);border-color:var(--gr)}
+/* List row */
+.lr{display:flex;align-items:center;gap:10px;padding:10px;background:var(--c2);border-radius:var(--r10);margin-bottom:6px}
+.lrico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.lrbody{flex:1;min-width:0}
+.lrname{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrsub{font-size:11px;color:var(--soft);margin-top:2px}
+/* Empty */
+.empty{text-align:center;padding:32px 20px}
+.ei{font-size:40px;margin-bottom:10px}
+.et{font-size:14px;color:var(--soft);margin-bottom:16px}
+/* Alert */
+.al{padding:9px 12px;border-radius:var(--r10);font-size:12px;font-weight:600;margin-bottom:6px}
+.alw{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:var(--yw)}
+.ale{background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.3);color:var(--rd)}
+.alg{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--gr)}
+/* Heatmap row for habits */
+.hm-row{display:flex;gap:3px;margin-bottom:4px;align-items:center}
+.hm-cell{width:12px;height:12px;border-radius:2px;background:var(--c3);flex-shrink:0}
+.hm-cell.lv1{background:rgba(124,58,237,.3)}
+.hm-cell.lv2{background:rgba(124,58,237,.55)}
+.hm-cell.lv3{background:rgba(124,58,237,.8)}
+.hm-cell.lv4{background:var(--acc2)}
+/* Tg toggle */
+.tg{display:flex;background:var(--c2);border:1px solid var(--c3);border-radius:var(--r10);padding:3px;gap:3px;margin-bottom:10px}
+.tgb{flex:1;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:700;background:none;color:var(--soft)}
+.tgb.on{background:var(--acc);color:#fff}
+/* Settings */
+.set-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--c3)}
+.set-lbl{font-size:13px;font-weight:600}
+.set-sub{font-size:11px;color:var(--soft);margin-top:2px}
+
+/* ─── DESKTOP LAYOUT (768px+) ─────────────────────────────── */
+@media(min-width:768px){
+  body { overflow: hidden; height: 100vh; }
+  .bnav { display: none !important; }
+  #app { display: flex !important; height: 100vh; padding-bottom: 0; overflow: hidden; }
+  .snav { display: flex !important; }
+  .main-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+  .hdr { position: relative; flex-shrink: 0; }
+  .pages-wrap { flex: 1; overflow-y: auto; }
+  .pg { max-width: 1100px; padding: 20px 28px; margin: 0 auto; }
+  /* Dashboard 2-col grid */
+  .d-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start; }
+  .d-col-left, .d-col-right { display: flex; flex-direction: column; gap: 0; }
+  /* Bigger hero */
+  .hero { text-align: left; padding: 24px 28px; }
+  .hval { font-size: 38px; }
+  .hrow { justify-content: flex-start; }
+  /* Kanban always 3 cols */
+  .kanban { grid-template-columns: repeat(3, 1fr) !important; }
+  /* Agenda grid bigger */
+  .cal-day { min-height: 72px; }
+  .cal-day-num { font-size: 14px; }
+  /* Modal centered & wider */
+  .ov { align-items: center; padding: 20px; }
+  .mbox { border-radius: 18px !important; max-width: 520px; }
+  /* Cards hover */
+  .goal-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+  /* Settings 2 col */
+  .s-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  /* Wider habits grid */
+  .hm-row { gap: 4px; }
+  .hm-cell { width: 14px; height: 14px; }
+  /* Toast higher */
+  .toast-ct { bottom: 24px; }
+  /* Habits today grid */
+  .hab-today-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+}
+
+/* ─── SIDEBAR NAV ──────────────────────────────────────────── */
+.snav {
+  display: none;
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--c1);
+  border-right: 1px solid var(--c3);
+  flex-direction: column;
+  padding: 20px 12px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+}
+.snav-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; margin-bottom: 24px;
+}
+.snav-logo span { font-size: 28px; }
+.snav-title { font-size: 18px; font-weight: 800;
+  background: linear-gradient(135deg, var(--acc2), var(--cy));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.snav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 10px;
+  border: none; background: none; color: var(--soft);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  width: 100%; text-align: left; transition: .15s; margin-bottom: 2px;
+}
+.snav-item:hover { background: var(--c2); color: var(--txt); }
+.snav-item.on { background: rgba(124,58,237,.15); color: var(--acc2); }
+.snav-item.on .snav-ico { filter: drop-shadow(0 0 4px var(--acc2)); }
+.snav-ico { font-size: 18px; }
+.snav-divider { border: none; border-top: 1px solid var(--c3); margin: 12px 0; }
+.snav-section { font-size:9px; font-weight:700; text-transform:uppercase;
+  letter-spacing:1.5px; color:var(--mut); padding: 4px 14px; margin-bottom: 4px; }
+.snav-bottom { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--c3); }
+
+</style>
+</head>
+<body>
+<div id="toast-ct" class="toast-ct"></div>
+
+<!-- LOGIN -->
+<div class="lw" id="lw">
+  <div class="lbox">
+    <div class="llogo">
+      <span class="icon">🧠</span>
+      <h1>LifeOS</h1>
+      <p>Tu sistema de vida personal</p>
+    </div>
+    <input class="li" type="password" id="lpass" placeholder="Contraseña" onkeypress="if(event.key==='Enter')doLogin()"/>
+    <button class="lbtn" onclick="doLogin()">Entrar →</button>
+    <p style="font-size:11px;color:var(--soft);text-align:center;margin-top:12px">Primera vez: contraseña <b>1234</b></p>
+    <div style="text-align:center;margin-top:12px">
+      <button onclick="abrirRecPIN()" style="font-size:11px;color:var(--soft);background:none;border:none;text-decoration:underline;cursor:pointer">¿Olvidaste tu contraseña?</button>
+    </div>
+    <div id="recPINPanel" style="display:none;margin-top:12px;background:var(--c2);border-radius:10px;padding:14px;border:1px solid var(--c3)">
+      <p style="font-size:12px;color:var(--soft);margin-bottom:8px">Ingresa tu PIN de emergencia y nueva contraseña</p>
+      <input type="password" id="recPINInput" maxlength="4" inputmode="numeric" placeholder="••••" style="text-align:center;font-size:22px;letter-spacing:10px;margin-bottom:8px">
+      <input type="password" id="recNewPass" placeholder="Nueva contraseña" style="margin-bottom:8px">
+      <button class="btn bp bfu" onclick="verificarPINRecovery()">✓ Cambiar contraseña</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR (desktop only) -->
+  <nav class="snav" id="snav">
+    <div class="snav-logo">
+      <span>🧠</span>
+      <span class="snav-title">LifeOS</span>
+    </div>
+    <div class="snav-section">Principal</div>
+    <button class="snav-item on" id="sn-d" onclick="showPg('pg-d')">
+      <span class="snav-ico">🏠</span> Inicio
+    </button>
+    <button class="snav-item" id="sn-a" onclick="showPg('pg-a')">
+      <span class="snav-ico">📅</span> Agenda
+    </button>
+    <button class="snav-item" id="sn-t" onclick="showPg('pg-t')">
+      <span class="snav-ico">✅</span> Tareas
+    </button>
+    <button class="snav-item" id="sn-g" onclick="showPg('pg-g')">
+      <span class="snav-ico">🎯</span> Metas
+    </button>
+    <button class="snav-item" id="sn-h" onclick="showPg('pg-h')">
+      <span class="snav-ico">💪</span> Hábitos
+    </button>
+    <hr class="snav-divider">
+    <div class="snav-section">Más</div>
+    <button class="snav-item" id="sn-ana" onclick="showPg('pg-ana')">
+      <span class="snav-ico">📊</span> Analíticas
+    </button>
+    <button class="snav-item" id="sn-j" onclick="showPg('pg-j')">
+      <span class="snav-ico">📓</span> Diario
+    </button>
+    <div class="snav-bottom">
+      <button class="snav-item" id="sn-help" onclick="showPg('pg-help')">
+        <span class="snav-ico">❓</span> Guía de uso
+      </button>
+      <button class="snav-item" id="sn-s" onclick="showPg('pg-s')">
+        <span class="snav-ico">⚙️</span> Ajustes
+      </button>
+    </div>
+  </nav>
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrap">
+  <div class="hdr">
+    <div class="hdr-left">
+      <span class="hdr-title">🧠 LifeOS</span>
+      <span class="hdr-date" id="hdrDate"></span>
+    </div>
+    <div class="hdr-right">
+      <span class="hdr-time" id="hdrTime"></span>
+      <button class="btn bs bsm" onclick="showPg('pg-help')">❓</button><button class="btn bs bsm" onclick="showPg('pg-s')">⚙️</button>
+    </div>
+  </div>
+
+  <div class="pages-wrap">
+  <!-- DASHBOARD -->
+  <div class="pg on" id="pg-d">
+    <div class="hero">
+      <div style="font-size:11px;color:var(--soft);text-transform:uppercase;letter-spacing:1.5px" id="greet"></div>
+      <div class="hval cv" id="heroDate"></div>
+      <div style="font-size:12px;color:var(--soft);margin-top:4px" id="heroSub"></div>
+      <div class="hrow" id="dRow"></div>
+    </div>
+    <div id="dAlerts"></div>
+    <div class="d-grid">
+      <div class="d-col-left">
+        <div id="finWidget"></div>
+        <div class="sh"><div class="st">📅 Hoy</div><button class="btn bp bsm" onclick="openEvent(null,todayStr())">+ Evento</button></div>
+        <div id="dToday"></div>
+        <div class="sh"><div class="st">✅ Tareas prioritarias</div><button class="btn bp bsm" onclick="openTask(null)">+ Tarea</button></div>
+        <div id="dTasks"></div>
+      </div>
+      <div class="d-col-right">
+        <div class="sh"><div class="st">💪 Hábitos de hoy</div></div>
+        <div id="dHabits"></div>
+        <div class="sh"><div class="st">🎯 Objetivos activos</div></div>
+        <div id="dGoals"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="pg" id="pg-a">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn bs bsm" onclick="calNav(-1)">‹</button>
+        <span id="calMonthLbl" style="font-size:15px;font-weight:700;min-width:130px;text-align:center"></span>
+        <button class="btn bs bsm" onclick="calNav(1)">›</button>
+      </div>
+      <button class="btn bp bsm" onclick="openEvent(null,todayStr())">+ Evento</button>
+    </div>
+    <div class="cal-header">
+      <div class="cal-dh">Dom</div><div class="cal-dh">Lun</div><div class="cal-dh">Mar</div>
+      <div class="cal-dh">Mié</div><div class="cal-dh">Jue</div><div class="cal-dh">Vie</div><div class="cal-dh">Sáb</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="sh" style="margin-top:14px"><div class="st" id="selDateLbl">Eventos</div><span style="font-size:10px;color:var(--mut)">Toca ✏️ para editar</span></div>
+    <div id="calDayEvents"></div>
+  </div>
+
+  <!-- TAREAS -->
+  <div class="pg" id="pg-t">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="chips" id="taskFilters" style="margin:0"></div>
+      <button class="btn bp bsm" onclick="openTask(null)" style="flex-shrink:0;margin-left:8px">+ Tarea</button>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:6px"><button class="btn bs bsm" onclick="clearDoneTasks()" style="font-size:11px;color:var(--rd)">🗑️ Limpiar completadas</button></div>
+    <div style="font-size:11px;color:var(--mut);margin-bottom:8px;text-align:center">Toca cualquier tarea para editarla o eliminarla</div>
+    <div class="kanban" id="kanban"></div>
+  </div>
+
+  <!-- METAS -->
+  <div class="pg" id="pg-g">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="chips" id="goalFilters" style="margin:0"></div>
+      <button class="btn bp bsm" onclick="openGoal(null)" style="flex-shrink:0;margin-left:8px">+ Meta</button>
+    </div>
+    <div id="goalList"></div>
+    <div id="goalHint" style="font-size:11px;color:var(--mut);text-align:center;margin-bottom:6px;display:none">Toca una meta para ver detalle, editarla o eliminarla</div>
+    <div id="goalDetail" style="display:none"></div>
+  </div>
+
+  <!-- HABITOS -->
+  <div class="pg" id="pg-h">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:15px;font-weight:700">💪 Mis hábitos</div>
+      <button class="btn bp bsm" onclick="openHabit(null)">+ Hábito</button>
+    </div>
+    <div class="sh"><div class="st">Hoy — <span id="habTodayDate"></span></div><span style="font-size:10px;color:var(--mut)">Toca ✏️ para editar o eliminar</span></div>
+    <div id="habToday"></div>
+    <div class="sh" style="margin-top:4px"><div class="st">Seguimiento — últimas 8 semanas</div></div>
+    <div id="habTrack"></div>
+    <div class="sh"><div class="st">📊 Analíticas</div></div>
+    <div class="card"><canvas id="habChart" height="90"></canvas></div>
+  </div>
+
+
+  <!-- HELP -->
+  <div class="pg" id="pg-help">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:16px;font-weight:800">❓ Guía completa — LifeOS</div>
+      <button class="btn bs bsm" onclick="showPg('pg-d')">← Inicio</button>
+    </div>
+
+    <!-- INDEX -->
+    <div class="card" style="margin-bottom:10px;background:linear-gradient(135deg,#1a0a2e,#0d1a3a);border-color:var(--acc)">
+      <div style="font-size:12px;font-weight:700;color:var(--acc2);margin-bottom:8px">📋 Índice rápido</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+        <a onclick="document.getElementById('sec-netlify').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">🚀 Subir a Netlify</a>
+        <a onclick="document.getElementById('sec-drive').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">☁️ Conectar Drive</a>
+        <a onclick="document.getElementById('sec-finance').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">💰 Vincular FinanceOS</a>
+        <a onclick="document.getElementById('sec-dash').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">🏠 Dashboard</a>
+        <a onclick="document.getElementById('sec-agenda').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">📅 Agenda</a>
+        <a onclick="document.getElementById('sec-tasks').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">✅ Tareas</a>
+        <a onclick="document.getElementById('sec-goals').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">🎯 Metas</a>
+        <a onclick="document.getElementById('sec-habits').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">💪 Hábitos</a>
+        <a onclick="document.getElementById('sec-journal').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">📓 Diario</a>
+        <a onclick="document.getElementById('sec-analytics').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">📊 Analíticas</a>
+        <a onclick="document.getElementById('sec-themes').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">🎨 Temas y colores</a>
+        <a onclick="document.getElementById('sec-routine').scrollIntoView({behavior:'smooth'})" style="font-size:11px;color:var(--acc2);cursor:pointer;padding:4px 0">📆 Rutina recomendada</a>
+      </div>
+    </div>
+
+    <!-- NETLIFY -->
+    <div id="sec-netlify"></div>
+    <details style="background:var(--c1);border:1px solid var(--c3);border-radius:14px;padding:14px;margin-bottom:8px" open>
+      <summary style="font-weight:700;font-size:14px;cursor:pointer">🚀 Cómo subir a Netlify (primera vez)</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--soft);line-height:2">
+        <ol style="padding-left:18px">
+          <li>Descarga el archivo <b style="color:var(--txt)">LifeOS.html</b> a tu computadora</li>
+          <li>Crea una carpeta nueva en tu computadora y llámala <b style="color:var(--txt)">lifeos</b></li>
+          <li>Mete el archivo HTML dentro de esa carpeta</li>
+          <li>Abre el navegador y ve a <b style="color:var(--acc2)">netlify.com</b></li>
+          <li>Inicia sesión con tu cuenta de Netlify</li>
+          <li>En el panel busca <b style="color:var(--txt)">"Add new site" → "Deploy manually"</b></li>
+          <li>Arrastra la carpeta <b style="color:var(--txt)">lifeos</b> completa al área gris</li>
+          <li>Netlify genera una URL como <b style="color:var(--txt)">https://random-name.netlify.app</b></li>
+          <li>Para cambiarle el nombre: <b style="color:var(--txt)">Site configuration → Change site name</b></li>
+          <li>Abre esa URL — verás la pantalla de login de LifeOS</li>
+          <li>Entra con la contraseña <b style="color:var(--acc2)">1234</b> (cámbiala luego en Ajustes)</li>
+        </ol>
+        <div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:10px;margin-top:10px">
+          <b style="color:var(--yw)">⚠️ Para actualizar en el futuro:</b><br>
+          Netlify → tu sitio → pestaña <b>Deploys</b> → arrastra el nuevo archivo HTML. Tus datos en Drive no se borran.
+        </div>
+      </div>
+    </details>
+
+    <!-- DRIVE -->
+    <div id="sec-drive"></div>
+    <details style="background:var(--c1);border:1px solid var(--c3);border-radius:14px;padding:14px;margin-bottom:8px">
+      <summary style="font-weight:700;font-size:14px;cursor:pointer">☁️ Conectar Google Drive paso a paso</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--soft);line-height:2">
+        <b style="color:var(--txt)">Primero autoriza tu dominio en Google Cloud (solo se hace una vez):</b>
+        <ol style="padding-left:18px;margin-top:6px">
+          <li>Ve a <b style="color:var(--acc2)">console.cloud.google.com</b></li>
+          <li>Selecciona tu proyecto <b style="color:var(--txt)">ProduccionOS</b> en la barra superior</li>
+          <li>Menú izquierdo → <b style="color:var(--txt)">APIs y servicios → Credenciales</b></li>
+          <li>Haz clic en tu <b style="color:var(--txt)">Client ID</b> para editarlo</li>
+          <li>Sección <b style="color:var(--txt)">"Orígenes de JavaScript autorizados"</b> → <b>+ Agregar URI</b></li>
+          <li>Escribe tu URL de Netlify: <b style="color:var(--txt)">https://tu-lifeos.netlify.app</b></li>
+          <li>Sección <b style="color:var(--txt)">"URIs de redireccionamiento"</b> → <b>+ Agregar URI</b></li>
+          <li>Agrega la misma URL de Netlify</li>
+          <li>Clic en <b style="color:var(--txt)">Guardar</b> — espera 2-3 minutos</li>
+        </ol>
+        <b style="color:var(--txt)">Luego conecta Drive desde la app:</b>
+        <ol style="padding-left:18px;margin-top:6px">
+          <li>Entra a LifeOS → toca ⚙️ arriba a la derecha</li>
+          <li>Sección <b style="color:var(--txt)">"☁️ Google Drive"</b></li>
+          <li>Verifica que el Client ID esté visible en el campo</li>
+          <li>Toca <b style="color:var(--acc2)">🔗 Conectar Google Drive</b></li>
+          <li>Se abre ventana de Google — elige tu cuenta de Gmail</li>
+          <li>Acepta los permisos — toca <b style="color:var(--txt)">Continuar</b> o <b style="color:var(--txt)">Permitir</b></li>
+          <li>Verás <b style="color:var(--gr)">✅ Conectado</b></li>
+          <li>Toca <b style="color:var(--acc2)">☁️ Guardar</b> para crear el primer respaldo</li>
+          <li>Aparece el toast <b style="color:var(--txt)">"☁️ Guardado en Drive"</b></li>
+        </ol>
+        <b style="color:var(--txt)">Para abrir en otro dispositivo:</b>
+        <ol style="padding-left:18px;margin-top:6px">
+          <li>Abre la misma URL de Netlify</li>
+          <li>Entra con tu contraseña</li>
+          <li>⚙️ Ajustes → Conectar Drive → <b style="color:var(--acc2)">📥 Restaurar</b></li>
+          <li>Todos tus datos aparecen al instante</li>
+        </ol>
+        <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:10px;margin-top:8px">
+          <b style="color:var(--gr)">💡 Drive sincroniza automáticamente</b> — 3 segundos después de cada cambio guarda solo. No necesitas tocar nada manualmente.
+        </div>
+      </div>
+    </details>
+
+    <!-- FINANCEOS LINK -->
+    <div id="sec-finance"></div>
+    <details style="background:var(--c1);border:1px solid var(--c3);border-radius:14px;padding:14px;margin-bottom:8px">
+      <summary style="font-weight:700;font-size:14px;cursor:pointer">💰 Vincular con FinanceOS paso a paso</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--soft);line-height:2">
+        <p>LifeOS puede leer los datos de tu FinanceOS guardados en Drive y mostrarlos en tu Dashboard. Esto es de <b style="color:var(--txt)">solo lectura</b> — LifeOS nunca modifica tus datos financieros.</p>
+        <br>
+        <b style="color:var(--txt)">Lo que verás en el Dashboard:</b>
+        <ul style="padding-left:18px;margin:6px 0">
+          <li>💰 Tu patrimonio total en tiempo real</li>
+          <li>🏦 Saldo total en bancos</li>
+          <li>📊 Total de inversiones</li>
+          <li>📉 Total de deudas pendientes</li>
+          <li>🎯 Tus metas de ahorro con barras de progreso</li>
+          <li>🏪 Cada negocio con su ganancia neta</li>
+        </ul>
+        <b style="color:var(--txt)">Requisito previo:</b>
+        <p style="margin:4px 0">Debes haber guardado en Drive desde tu FinanceOS al menos una vez. El archivo se llama <b style="color:var(--txt)">financeos_v5.json</b> en tu Google Drive.</p>
+        <br>
+        <b style="color:var(--txt)">Pasos para vincular:</b>
+        <ol style="padding-left:18px;margin-top:6px">
+          <li>Primero conecta Google Drive en LifeOS (sección anterior)</li>
+          <li>Ve a ⚙️ Ajustes</li>
+          <li>Baja hasta la sección <b style="color:var(--acc2)">"💰 Conectar con FinanceOS"</b></li>
+          <li>Toca el botón <b style="color:var(--acc2)">🔄 Sincronizar con FinanceOS</b></li>
+          <li>LifeOS busca automáticamente el archivo en Drive</li>
+          <li>En segundos verás <b style="color:var(--gr)">✅ Sincronizado</b> con la hora</li>
+          <li>Regresa al Dashboard — aparece el widget morado con tus finanzas</li>
+        </ol>
+        <b style="color:var(--txt)">Para mantenerlo actualizado:</b>
+        <ul style="padding-left:18px;margin-top:6px">
+          <li>Cada vez que hagas cambios en FinanceOS, guarda en Drive desde ahí</li>
+          <li>En LifeOS toca el botón <b style="color:var(--txt)">🔄</b> del widget para refrescar</li>
+          <li>O ve a Ajustes → Sincronizar con FinanceOS de nuevo</li>
+        </ul>
+        <div style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:10px;margin-top:8px">
+          <b style="color:var(--acc2)">Ambos sistemas usan el mismo Client ID y la misma cuenta de Google Drive.</b> No necesitas crear nada nuevo — ya tienes todo configurado desde FinanceOS.
+        </div>
+      </div>
+    </details>
+
+    <!-- DASHBOARD -->
+    <div id="sec-dash"></div>
+    <details style="background:var(--c1);border:1px solid var(--c3);border-radius:14px;padding:14px;margin-bottom:8px">
+      <summary style="font-weight:700;font-size:14px;cursor:pointer">🏠 Dashboard — Inicio</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--soft);line-height:1.9">
+        <p>Tu pantalla principal. Se actualiza cada 30 segundos automáticamente y muestra todo lo relevante del día.</p>
+        <br>
+        <b style="color:var(--txt)">Secciones del Dashboard:</b>
+        <ul style="padding-left:18px;margin-top:6px">
+          <li><b style="color:var(--txt)">Hero superior</b> — saludo personalizado, día y resumen de 4 números: tareas pendientes, completadas este mes, hábitos del día y metas activas</li>
+          <li><b style="color:var(--txt)">Widget FinanceOS</b> — si tienes vinculado el sistema financiero, aparece aquí con tu patrimonio y resumen</li>
+          <li><b style="color:var(--txt)">Alertas</b> — tareas vencidas en rojo, metas con fecha límite próxima en amarillo, racha de hábitos en verde</li>
+          <li><b style="color:var(--txt)">Eventos de hoy</b> — lo programado en la Agenda para hoy con su hora y categoría</li>
+          <li><b style="color:var(--txt)">Tareas prioritarias</b> — las 3 más urgentes con botón ✓ para completarlas sin abrir el Kanban</li>
+          <li><b style="color:var(--txt)">Hábitos de hoy</b> — toca el ícono para marcarlos como cumplidos, muestra la racha de cada uno</li>
+          <li><b style="color:var(--txt)">Objetivos activos</b> — los 3 principales con barra de progreso y días restantes</li>
+        </ul>
+        <br>
+        <b style="color:var(--txt)">💡 Tip:</b> Empieza cada día abriendo el Dashboard. Es tu centro de comando diario.
+      </div>
+    </details>
+
+    <!-- AGENDA -->
+    <div id="sec-agenda"></div>
+    <details style="background:var(--c1);border:1px solid var(--c3);border-radius:14px;padding:14px;margin-bottom:8px">
+      <summary style="font-weight:700;font-size:14px;cursor:pointer">📅 Agenda — Calendario</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--soft);line-height:1.9">
+        <b style="color:var(--txt)">Cómo navegar:</b>
+        <ul style="padding-left:18px;margin-top:4px">
+          <li>Toca <b style="color:var(--txt)">‹ ›</b> para cambiar de mes</li>
+          <li>Toca cualquier día para ver sus eventos debajo del calendario</li>
+          <li>El día de hoy tiene borde morado</li>
+          <li>Los puntos de colores en cada día indican eventos registrados</li>
+        </ul>
+        <b style="color:var(--txt)">Cómo agregar un evento:</b>
+        <ol style="padding-left:18px;margin-top:4px">
+          <li>Toca el día donde quieres el evento</li>
+          <li>Toca <b style="color:var(--acc2)">+ Evento</b> arriba a la derecha</li>
+          <li>Escribe el título (ej: "Reunión con proveedor")</li>
+          <li>Agrega la hora de inicio y fin</li>
+          <li>Elige la categoría: Personal, Negocio, Salud, Reunión, Recordatorio, Financiero o Familia</li>
+          <li>Si es un evento que se repite, selecciona en "Repetir": Diario, Semanal o Mensual</li>
+          <li>Toca <b style="color:var(--acc2)">💾 Guardar evento</b></li>
+        </ol>
+        <b style="color:var(--txt)">Para editar o eliminar:</b>
+        <p style="margin:4px 0">Toca el evento en la lista del día → se abre el modal con sus datos → edita o toca 🗑️ Eliminar.</p>
+        <br>
+        <b style="color:var(--txt)">💡 Tip:</b> Usa la Agenda para cosas con fecha y hora específica. Para tareas sin hora fija usa el Kanban de Tareas.
+      </div>
+    </details>
+
+    <!-- TASKS -->
+    <div id="sec-tasks"></div>
+    <details style="background:var(--c1);border:1px solid var(--c3);border-radius:14px;padding:14px;margin-bottom:8px">
+      <summary style="font-weight:700;font-size:14px;cursor:pointer">✅ Tareas — Tablero Kanban</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--soft);line-height:1.9">
+        <p>El Kanban organiza tus tareas en 3 columnas según su avance:</p>
+        <ul style="padding-left:18px;margin:4px 0">
+          <li><b style="color:#fbbf24">⏳ Pendiente</b> — no empezadas todavía</li>
+          <li><b style="color:#3b82f6">🔄 En progreso</b> — las que ya estás haciendo</li>
+          <li><b style="color:#10b981">✅ Completada</b> — terminadas (últimas 10 visibles)</li>
+        </ul>
+        <b style="color:var(--txt)">Cómo crear una tarea:</b>
+        <ol style="padding-left:18px;margin-top:4px">
+          <li>Toca <b style="color:var(--acc2)">+ Tarea</b></li>
+          <li>Escribe el título de lo que debes hacer</li>
+          <li>Agrega descripción si necesitas más detalle</li>
+          <li>Elige la prioridad: 🔴 Urgente, 🟡 Alta, 🔵 Normal, 🟢 Baja</li>
+          <li>Pon la fecha límite si la tiene</li>
+          <li>Selecciona el área (Negocio, Personal, Salud, etc.)</li>
+          <li>El estado inicial es "Pendiente" — cámbialo aquí o desde el Kanban</li>
+          <li>Toca <b style="color:var(--acc2)">💾 Guardar tarea</b></li>
+        </ol>
+        <b style="color:var(--txt)">Flujo diario recomendado:</b>
+        <ul style="padding-left:18px;margin-top:4px">
+          <li><b>Noche anterior</b> → crea las tareas del día siguiente con fecha límite = mañana</li>
+          <li><b>Durante el día</b> → muévelas a "En progreso" cuando las empiezas (edita la tarea y cambia estado)</li>
+          <li><b>Al terminar</b> → toca ✓ Marcar completa desde el Dashboard o el Kanban</li>
+        </ul>
+        <b style="color:var(--txt)">Filtros por área:</b>
+        <p style="margin:4px 0">Los chips arriba (Todas, Negocio, Personal...) filtran el Kanban para ver solo las tareas de esa área.</p>
+        <br>
+        <b style="color:var(--txt)">💡 Tip:</b> Las tareas con fecha vencida aparecen como alertas rojas en el Dashboard para que no se te olviden.
+      </div>
+    </details>
+
+    <!-- GOALS -->
+    <div id="sec-goals"></div>
+    <details style="background:var(--c1);border:1px solid var(--c3);border-radius:14px;padding:14px;margin-bottom:8px">
+      <summary style="font-weight:700;font-size:14px;cursor:pointer">🎯 Metas — Objetivos grandes</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--soft);line-height:1.9">
+        <p>Para objetivos que tardan semanas o meses en lograrse — no solo un día.</p>
+        <br>
+        <b style="color:var(--txt)">Cómo crear una meta:</b>
+        <ol style="padding-left:18px;margin-top:4px">
+          <li>Toca <b style="color:var(--acc2)">+ Meta</b></li>
+          <li>Escribe el título claro y específico (ej: "Abrir segunda sucursal antes de julio")</li>
+          <li>Agrega una descripción del porqué es importante para ti</li>
+          <li>Elige el área: Financiero, Personal, Negocio, Salud, Familia o Aprendizaje</li>
+          <li>Pon la fecha límite para lograrlo</li>
+          <li>Define la importancia: 🔥 Alta, ⚡ Media, 💡 Baja</li>
+          <li>Toca <b style="color:var(--acc2)">💾 Guardar objetivo</b></li>
+        </ol>
+        <b style="color:var(--txt)">Cómo dar seguimiento:</b>
+        <ol style="padding-left:18px;margin-top:4px">
+          <li>Toca la meta para abrir su detalle</li>
+          <li>Toca <b style="color:var(--acc2)">+ Paso</b> para agregar hitos concretos (ej: "Buscar local", "Registrar negocio", "Contratar personal")</li>
+          <li>Conforme avances, toca el cuadrito ✓ de cada paso — la barra de progreso sube automáticamente</li>
+          <li>Toca <b style="color:var(--acc2)">+ Nota</b> para escribir actualizaciones, aprendizajes u obstáculos</li>
+          <li>Cuando la logres: toca <b style="color:var(--gr)">✅ Marcar como logrado</b></li>
+        </ol>
+        <b style="color:var(--txt)">Estados:</b>
+        <ul style="padding-left:18px;margin-top:4px">
+          <li>🔥 <b style="color:var(--txt)">Activa</b> — trabajando en ella ahora</li>
+          <li>⏸ <b style="color:var(--txt)">Pausada</b> — en espera temporal</li>
+          <li>✅ <b style="color:var(--txt)">Lograda</b> — ¡completada!</li>
+        </ul>
+        <br>
+        <b style="color:var(--txt)">💡 Tip:</b> Divide cada meta en 5 a 10 pasos pequeños. El progreso visible te mantiene motivado. Escribe una nota de avance cada semana.
+      </div>
+    </details>
+
+    <!-- HABITS -->
+    <div id="sec-habits"></div>
+    <details style="background:var(--c1);border:1px solid var(--c3);border-radius:14px;padding:14px;margin-bottom:8px">
+      <summary style="font-weight:700;font-size:14px;cursor:pointer">💪 Hábitos — Seguimiento diario</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--soft);line-height:1.9">
+        <b style="color:var(--txt)">Cómo crear un hábito:</b>
+        <ol style="padding-left:18px;margin-top:4px">
+          <li>Toca <b style="color:var(--acc2)">+ Hábito</b></li>
+          <li>Escribe un emoji que lo represente (ej: 🏃 para correr, 📚 para leer)</li>
+          <li>Escribe el nombre del hábito (ej: "Correr 30 min", "Leer 20 páginas")</li>
+          <li>Elige el área a la que pertenece</li>
+          <li>Selecciona un color identificador tocando uno de los círculos</li>
+          <li>Toca <b style="color:var(--acc2)">💾 Guardar hábito</b></li>
+        </ol>
+        <b style="color:var(--txt)">Cómo marcar un hábito cumplido:</b>
+        <ul style="padding-left:18px;margin-top:4px">
+          <li>Desde el Dashboard: toca el ícono del hábito — cambia a color cuando está cumplido</li>
+          <li>Desde la sección Hábitos: toca el cuadro grande de color del hábito</li>
+          <li>Se puede desmarcar tocando de nuevo</li>
+        </ul>
+        <b style="color:var(--txt)">Lo que el sistema mide:</b>
+        <ul style="padding-left:18px;margin-top:4px">
+          <li><b style="color:var(--txt)">🔥 Racha</b> — días consecutivos cumplidos. Si un día lo saltas, la racha regresa a 0</li>
+          <li><b style="color:var(--txt)">% 30 días</b> — porcentaje de días cumplidos en el último mes</li>
+          <li><b style="color:var(--txt)">Cuadrícula 8 semanas</b> — visualización de cada día con su color si fue cumplido</li>
+          <li><b style="color:var(--txt)">Gráfica de barras</b> — comparativa de adherencia entre todos tus hábitos</li>
+        </ul>
+        <br>
+        <b style="color:var(--txt)">💡 Tip:</b> Empieza con máximo 3-4 hábitos. Es mejor cumplir pocos que fallar en muchos. Una racha de 21 días seguidos es cuando el hábito se vuelve automático.
+      </div>
+    </details>
+
+    <!-- JOURNAL -->
+    <div id="sec-journal"></div>
+    <details style="background:var(--c1);border:1px solid var(--c3);border-radius:14px;padding:14px;margin-bottom:8px">
+      <summary style="font-weight:700;font-size:14px;cursor:pointer">📓 Diario personal</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--soft);line-height:1.9">
+        <p>Tu espacio privado para reflexionar. Accede desde <b style="color:var(--txt)">⚙️ Ajustes → Abrir diario</b>.</p>
+        <br>
+        <b style="color:var(--txt)">Cómo escribir una entrada:</b>
+        <ol style="padding-left:18px;margin-top:4px">
+          <li>Toca <b style="color:var(--acc2)">+ Entrada</b></li>
+          <li>La fecha se llena automáticamente con hoy — puedes cambiarla para escribir de otro día</li>
+          <li>Selecciona tu estado de ánimo tocando un emoji: 🤩😊😐😔😤</li>
+          <li>Escribe libremente en el campo de texto — lo que viviste, decidiste o aprendiste</li>
+          <li>En "3 cosas buenas" escribe tres cosas positivas del día (práctica de gratitud)</li>
+          <li>Toca <b style="color:var(--acc2)">💾 Guardar entrada</b></li>
+        </ol>
+        <b style="color:var(--txt)">Para leer entradas anteriores:</b>
+        <p style="margin:4px 0">Las entradas aparecen ordenadas de la más reciente a la más antigua. Toca cualquiera para abrirla y editarla.</p>
+        <br>
+        <b style="color:var(--txt)">💡 Tip:</b> Escribe 5 minutos cada noche. En un año tendrás un registro completo de tu vida y crecimiento. En los momentos difíciles, leer entradas pasadas te ayuda a ver cuánto has avanzado.
+      </div>
+    </details>
+
+    <!-- ANALYTICS -->
+    <div id="sec-analytics"></div>
+    <details style="background:var(--c1);border:1px solid var(--c3);border-radius:14px;padding:14px;margin-bottom:8px">
+      <summary style="font-weight:700;font-size:14px;cursor:pointer">📊 Analíticas — Tu progreso visual</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--soft);line-height:1.9">
+        <p>Accede desde <b style="color:var(--txt)">⚙️ Ajustes → Ver analíticas completas</b>.</p>
+        <br>
+        <b style="color:var(--txt)">Las 4 gráficas disponibles:</b>
+        <ul style="padding-left:18px;margin-top:6px">
+          <li><b style="color:var(--txt)">Tareas completadas (30 días)</b> — barras mostrando cuántas tareas completaste cada día. Te muestra tus días más productivos.</li>
+          <li><b style="color:var(--txt)">Objetivos por área</b> — dona de colores mostrando en qué áreas de vida tienes más metas. Si una área domina, considera balancear.</li>
+          <li><b style="color:var(--txt)">Adherencia de hábitos</b> — barras mostrando el % de días cumplidos de cada hábito en 30 días. Por debajo de 50% necesita atención.</li>
+          <li><b style="color:var(--txt)">Balance de vida (Radar)</b> — hexágono de 6 ejes: Financiero, Personal, Negocio, Salud, Familia y Aprendizaje. El sistema calcula el score de cada área basándose en cuántas metas, tareas completadas y hábitos tienes en cada una. Un hexágono equilibrado significa vida balanceada.</li>
+        </ul>
+        <br>
+        <b style="color:var(--txt)">Estadísticas en la parte superior:</b>
+        <ul style="padding-left:18px;margin-top:4px">
+          <li>Total de tareas completadas vs total registradas</li>
+          <li>Tasa de completar tareas (%)</li>
+          <li>Metas logradas vs total de metas</li>
+          <li>Adherencia promedio de todos los hábitos (últimos 30 días)</li>
+        </ul>
+        <br>
+        <b style="color:var(--txt)">💡 Tip:</b> Revisa las analíticas cada lunes. Si el radar tiene un eje muy bajo, esa semana enfócate en agregar actividades de esa área.
+      </div>
+    </details>
+
+    <!-- THEMES -->
+    <div id="sec-themes"></div>
+    <details style="background:var(--c1);border:1px solid var(--c3);border-radius:14px;padding:14px;margin-bottom:8px">
+      <summary style="font-weight:700;font-size:14px;cursor:pointer">🎨 Temas, colores y personalización</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--soft);line-height:1.9">
+        <p>Accede desde <b style="color:var(--txt)">⚙️ Ajustes → sección Personalización</b> (primera tarjeta al entrar a Ajustes).</p>
+        <br>
+        <b style="color:var(--txt)">Temas disponibles (8 en total):</b>
+        <ul style="padding-left:18px;margin-top:4px">
+          <li>🌌 <b style="color:var(--txt)">Cosmos</b> — azul oscuro con acento morado (tema por defecto)</li>
+          <li>🌊 <b style="color:var(--txt)">Océano</b> — azul marino profundo con acento celeste</li>
+          <li>🌿 <b style="color:var(--txt)">Selva</b> — verde oscuro con acento verde brillante</li>
+          <li>🔥 <b style="color:var(--txt)">Volcán</b> — marrón oscuro con acento naranja fuego</li>
+          <li>⚫ <b style="color:var(--txt)">AMOLED</b> — negro puro ideal para pantallas OLED, ahorra batería</li>
+          <li>🌸 <b style="color:var(--txt)">Aurora</b> — morado oscuro con acento rosa</li>
+          <li>🌙 <b style="color:var(--txt)">Midnight</b> — azul medianoche con acento turquesa</li>
+          <li>☀️ <b style="color:var(--txt)">Claro</b> — fondo blanco para uso con luz solar</li>
+        </ul>
+        <b style="color:var(--txt)">Color de acento personalizado:</b>
+        <p style="margin:4px 0">Toca el cuadro de color para abrir el selector — elige cualquier color del espectro. El acento se aplica en botones, bordes activos, gráficas y detalles de la interfaz.</p>
+        <br>
+        <b style="color:var(--txt)">Tamaño de texto:</b>
+        <ul style="padding-left:18px;margin-top:4px">
+          <li><b style="color:var(--txt)">Pequeño</b> — más contenido visible en pantalla</li>
+          <li><b style="color:var(--txt)">Normal</b> — tamaño estándar recomendado</li>
+          <li><b style="color:var(--txt)">Grande</b> — mejor legibilidad, ideal para pantallas pequeñas</li>
+        </ul>
+        <br>
+        <b style="color:var(--txt)">💡 Tip:</b> El tema y tamaño se guardan automáticamente. La próxima vez que abras la app en cualquier dispositivo (después de restaurar Drive) se aplicarán automáticamente.
+      </div>
+    </details>
+
+    <!-- ROUTINE -->
+    <div id="sec-routine"></div>
+    <div class="card" style="background:rgba(124,58,237,.08);border-color:var(--acc);margin-top:4px">
+      <div style="font-size:13px;font-weight:700;color:var(--acc2);margin-bottom:10px">📆 Rutina recomendada para aprovechar LifeOS al máximo</div>
+      <div style="font-size:12px;color:var(--soft);line-height:2">
+        <div style="background:var(--c2);border-radius:10px;padding:10px;margin-bottom:8px">
+          <b style="color:var(--gr)">☀️ Cada mañana (5 minutos)</b><br>
+          1. Abre el Dashboard — revisa alertas y eventos del día<br>
+          2. Identifica tus 3 tareas más importantes del día<br>
+          3. Mueve tareas a "En progreso" en el Kanban
+        </div>
+        <div style="background:var(--c2);border-radius:10px;padding:10px;margin-bottom:8px">
+          <b style="color:var(--cy)">🌤️ Durante el día</b><br>
+          1. Marca hábitos en el Dashboard conforme los cumples<br>
+          2. Completa tareas con el botón ✓ desde el Dashboard<br>
+          3. Agrega eventos a la Agenda si surge algo nuevo
+        </div>
+        <div style="background:var(--c2);border-radius:10px;padding:10px;margin-bottom:8px">
+          <b style="color:var(--acc2)">🌙 Cada noche (10 minutos)</b><br>
+          1. Escribe en el Diario — estado de ánimo + 3 cosas buenas<br>
+          2. Crea las tareas del día siguiente con su prioridad<br>
+          3. Revisa el avance de tus metas activas<br>
+          4. Sincroniza con FinanceOS si hiciste cambios financieros
+        </div>
+        <div style="background:var(--c2);border-radius:10px;padding:10px;margin-bottom:8px">
+          <b style="color:var(--yw)">📅 Cada semana (15 minutos)</b><br>
+          1. Revisa las Analíticas — ¿qué área necesita más atención?<br>
+          2. Actualiza el avance de pasos en tus metas<br>
+          3. Limpia el Kanban — mueve completadas, archiva lo irrelevante<br>
+          4. Planea los eventos importantes de la semana siguiente
+        </div>
+        <div style="background:var(--c2);border-radius:10px;padding:10px">
+          <b style="color:var(--pk)">🌟 Cada mes (30 minutos)</b><br>
+          1. Revisa el radar de balance de vida<br>
+          2. Crea nuevas metas para el mes que empieza<br>
+          3. Celebra hábitos con racha de 21+ días<br>
+          4. Lee entradas del diario del mes anterior<br>
+          5. Marca metas logradas y define las siguientes
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- SETTINGS -->
+  <div class="pg" id="pg-s">
+    <div class="sh"><div class="st">⚙️ Ajustes — LifeOS</div></div>
+    <div class="s-grid">
+    <div class="card" style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--soft);margin-bottom:14px">🎨 Personalización</div>
+
+      <label class="fl" style="margin-bottom:8px">Tema de color</label>
+      <div id="themeGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px"></div>
+
+      <label class="fl" style="margin-bottom:8px">Color de acento personalizado</label>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <input type="color" id="accentPicker" style="width:48px;height:48px;border:none;border-radius:10px;cursor:pointer;background:none;padding:2px" oninput="previewAccent(this.value)" onchange="applyCustomAccent(this.value)">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--txt)" id="accentLabel">Color actual</div>
+          <div style="font-size:11px;color:var(--soft)">Toca para elegir cualquier color</div>
+        </div>
+        <button class="btn bs bsm" onclick="resetAccent()">↺ Reset</button>
+      </div>
+
+      <label class="fl" style="margin-bottom:8px">Tamaño de texto</label>
+      <div style="display:flex;gap:8px;margin-bottom:4px">
+        <button onclick="setFontSize('small')" id="fs-small" class="btn bs" style="flex:1;flex-direction:column;gap:2px;padding:10px 6px">
+          <span style="font-size:11px">Aa</span><span style="font-size:10px;color:var(--soft)">Pequeño</span>
+        </button>
+        <button onclick="setFontSize('normal')" id="fs-normal" class="btn bs" style="flex:1;flex-direction:column;gap:2px;padding:10px 6px">
+          <span style="font-size:14px">Aa</span><span style="font-size:10px;color:var(--soft)">Normal</span>
+        </button>
+        <button onclick="setFontSize('large')" id="fs-large" class="btn bs" style="flex:1;flex-direction:column;gap:2px;padding:10px 6px">
+          <span style="font-size:18px">Aa</span><span style="font-size:10px;color:var(--soft)">Grande</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="set-row">
+        <div><div class="set-lbl">👤 Tu nombre</div><div class="set-sub">Aparece en el saludo del dashboard</div></div>
+        <input id="sName" style="width:120px;text-align:right;font-size:13px" placeholder="Tu nombre" oninput="S.name=this.value;persist();renderDash()">
+      </div>
+      <div class="set-row">
+        <div><div class="set-lbl">🔐 Nueva contraseña</div></div>
+        <div style="display:flex;gap:6px">
+          <input type="password" id="sPass" style="width:120px;font-size:13px" placeholder="Nueva">
+          <button class="btn bp bsm" onclick="cambiarPass()">✓</button>
+        </div>
+      </div>
+      <div class="set-row" style="border:none">
+        <div><div class="set-lbl">🔑 PIN de emergencia</div><div class="set-sub">Para recuperar contraseña</div></div>
+        <div style="display:flex;gap:6px">
+          <input type="password" id="sPIN" maxlength="4" inputmode="numeric" style="width:80px;text-align:center;font-size:16px;letter-spacing:6px" placeholder="••••">
+          <button class="btn bp bsm" onclick="guardarPIN()">✓</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--soft);margin-bottom:12px">☁️ Google Drive</div>
+      <div class="fg"><label class="fl">Client ID de Google</label><input id="sGDrive" placeholder="xxxx.apps.googleusercontent.com" oninput="S.googleClientId=this.value;persist()"></div>
+      <div id="driveStatus" style="font-size:12px;color:var(--soft);margin-bottom:8px"></div>
+      <button class="btn bp bsm" id="drvConnBtn" onclick="drvConnect()" style="width:100%;margin-bottom:6px">🔗 Conectar Google Drive</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <button class="btn bs bsm" onclick="drvSave()">☁️ Guardar</button>
+        <button class="btn bs bsm" onclick="drvLoad()">📥 Restaurar</button>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--soft)">🗂️ Áreas de vida</div>
+        <button class="btn bp bsm" onclick="openAreaModal(null)">+ Nueva área</button>
+      </div>
+      <p style="font-size:11px;color:var(--mut);margin-bottom:10px">Personaliza las áreas que aparecen en tareas, metas, hábitos y la gráfica de telaraña.</p>
+      <div id="areaList"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--soft);margin-bottom:12px">🗂️ Mantenimiento de datos</div>
+
+      <!-- Storage usage -->
+      <div id="storageInfo" style="background:var(--c2);border-radius:10px;padding:10px;margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:12px;font-weight:700">💾 Espacio usado</span>
+          <button class="btn bs bsm" onclick="calcStorage()" style="font-size:10px">Calcular</button>
+        </div>
+        <div id="storageBar" style="display:none">
+          <div class="pbar" style="margin-bottom:6px"><div id="storageFill" class="pbar-fill" style="background:var(--gr)"></div></div>
+          <div id="storageDetail" style="font-size:11px;color:var(--soft)"></div>
+        </div>
+      </div>
+
+      <!-- Archive options -->
+      <div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px">🧹 Limpiar por categoría</div>
+
+      <div class="set-row">
+        <div>
+          <div class="set-lbl">✅ Tareas completadas</div>
+          <div class="set-sub" id="taskCount"></div>
+        </div>
+        <select id="taskCleanRange" class="fi" style="width:110px;font-size:11px;padding:6px 8px">
+          <option value="30">Más de 30 días</option>
+          <option value="60">Más de 60 días</option>
+          <option value="90" selected>Más de 90 días</option>
+          <option value="0">Todas</option>
+        </select>
+      </div>
+      <button class="btn br bfu" style="margin-bottom:12px" onclick="cleanTasks()">🗑️ Eliminar tareas completadas</button>
+
+      <div class="set-row">
+        <div>
+          <div class="set-lbl">💪 Historial de hábitos</div>
+          <div class="set-sub" id="habitLogCount"></div>
+        </div>
+        <select id="habitCleanRange" class="fi" style="width:110px;font-size:11px;padding:6px 8px">
+          <option value="3">Más de 3 meses</option>
+          <option value="6" selected>Más de 6 meses</option>
+          <option value="12">Más de 1 año</option>
+        </select>
+      </div>
+      <button class="btn br bfu" style="margin-bottom:12px" onclick="cleanHabitLog()">🗑️ Limpiar historial de hábitos</button>
+
+      <div class="set-row">
+        <div>
+          <div class="set-lbl">📓 Entradas del diario</div>
+          <div class="set-sub" id="journalCount"></div>
+        </div>
+        <select id="journalCleanRange" class="fi" style="width:110px;font-size:11px;padding:6px 8px">
+          <option value="3">Más de 3 meses</option>
+          <option value="6" selected>Más de 6 meses</option>
+          <option value="12">Más de 1 año</option>
+          <option value="24">Más de 2 años</option>
+        </select>
+      </div>
+      <button class="btn br bfu" style="margin-bottom:12px" onclick="cleanJournal()">🗑️ Eliminar entradas antiguas</button>
+
+      <div class="set-row" style="border:none">
+        <div>
+          <div class="set-lbl">🎯 Metas logradas y pausadas</div>
+          <div class="set-sub" id="goalArchiveCount"></div>
+        </div>
+        <span></span>
+      </div>
+      <button class="btn br bfu" style="margin-bottom:16px" onclick="cleanGoals()">🗑️ Eliminar metas no activas</button>
+
+      <div style="border-top:1px solid var(--c3);padding-top:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--rd);margin-bottom:6px">⚠️ Zona de peligro</div>
+        <p style="font-size:11px;color:var(--soft);margin-bottom:8px;line-height:1.6">Antes de borrar todo, exporta o guarda en Drive. Esta acción no se puede deshacer.</p>
+        <button class="btn br bfu" onclick="nukeAll()">💥 Borrar TODOS los datos</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--soft);margin-bottom:12px">📤 Exportar / Importar</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+        <button class="btn bs bsm" onclick="expJSON()">⬇️ Exportar JSON</button>
+        <label class="btn bs bsm" style="cursor:pointer">📂 Importar<input type="file" accept=".json" style="display:none" onchange="impJSON(event)"></label>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--soft);margin-bottom:12px">💰 Conectar con FinanceOS</div>
+      <p style="font-size:12px;color:var(--soft);margin-bottom:10px;line-height:1.6">Muestra tu patrimonio, bancos, metas de ahorro y negocios en el Dashboard. Requiere tener Drive conectado.</p>
+      <div id="finSyncStatus" style="font-size:12px;color:var(--soft);margin-bottom:8px"></div>
+      <button class="btn bp bfu" onclick="syncFinanceOS()">🔄 Sincronizar con FinanceOS</button>
+      <p style="font-size:10px;color:var(--mut);margin-top:6px;text-align:center">Solo lectura — LifeOS nunca modifica tus datos financieros</p>
+    </div>
+    <div class="card">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--soft);margin-bottom:12px">📊 Mi progreso histórico</div>
+      <button class="btn bp bfu" onclick="showPg('pg-ana')">Ver analíticas completas →</button>
+    </div>
+    <div class="card">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--soft);margin-bottom:12px">📓 Diario personal</div>
+      <button class="btn bp bfu" onclick="showPg('pg-j')">Abrir diario →</button>
+    </div>
+    </div><!-- /s-grid -->
+    <button class="btn bs bfu" style="margin-top:4px" onclick="doLogout()">🚪 Cerrar sesión</button>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="pg" id="pg-ana">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <button class="btn bs bsm" onclick="showPg('pg-s')">← Volver</button>
+      <div style="font-size:15px;font-weight:700">📊 Analíticas</div>
+    </div>
+    <div class="g4" id="anaStats"></div>
+    <div class="sh" style="margin-top:8px"><div class="st">Tareas completadas — últimos 30 días</div></div>
+    <div class="card"><canvas id="taskChart" height="90"></canvas></div>
+    <div class="sh"><div class="st">Objetivos por área</div></div>
+    <div class="card"><canvas id="goalChart" height="180"></canvas></div>
+    <div class="sh"><div class="st">Adherencia de hábitos (%) por hábito</div></div>
+    <div class="card"><canvas id="habAnaChart" height="120"></canvas></div>
+    <div class="sh"><div class="st">Balance de vida por área</div></div>
+    <div class="card"><canvas id="radarChart" height="220"></canvas></div>
+  </div>
+
+  <!-- JOURNAL -->
+  <div class="pg" id="pg-j">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn bs bsm" onclick="showPg('pg-s')">← Volver</button>
+        <div style="font-size:15px;font-weight:700">📓 Diario</div>
+      </div>
+      <button class="btn bp bsm" onclick="openJournal(null)">+ Entrada</button>
+    </div>
+    <div style="font-size:11px;color:var(--mut);text-align:center;margin-bottom:8px">Toca cualquier entrada para editarla o eliminarla</div>
+    <div id="journalList"></div>
+  </div>
+
+  </div><!-- /pages-wrap -->
+  <nav class="bnav" id="bnav" style="display:none">
+    <button class="bni on" id="bn-d" onclick="showPg('pg-d')"><span class="bnico">🏠</span><span>Inicio</span></button>
+    <button class="bni" id="bn-a" onclick="showPg('pg-a')"><span class="bnico">📅</span><span>Agenda</span></button>
+    <button class="bni" id="bn-t" onclick="showPg('pg-t')"><span class="bnico">✅</span><span>Tareas</span></button>
+    <button class="bni" id="bn-g" onclick="showPg('pg-g')"><span class="bnico">🎯</span><span>Metas</span></button>
+    <button class="bni" id="bn-h" onclick="showPg('pg-h')"><span class="bnico">💪</span><span>Hábitos</span></button>
+  </nav>
+  </div><!-- /main-wrap -->
+</div>
+
+<!-- MODALS -->
+<div class="ov" id="mEvent" style="display:none" onclick="if(event.target===this)hideM('mEvent')">
+<div class="mbox">
+  <div class="mt">📅 Evento <button class="mc" onclick="hideM('mEvent')">✕</button></div>
+  <div class="fg"><label class="fl">Título *</label><input class="fi" id="evTitle" placeholder="Reunión, cita, recordatorio..."/></div>
+  <div class="fr">
+    <div class="fg"><label class="fl">Fecha *</label><input class="fi" id="evDate" type="date"/></div>
+    <div class="fg"><label class="fl">Hora</label><input class="fi" id="evTime" type="time"/></div>
+  </div>
+  <div class="fr">
+    <div class="fg"><label class="fl">Hora fin</label><input class="fi" id="evEndTime" type="time"/></div>
+    <div class="fg"><label class="fl">Categoría</label>
+      <select class="fi" id="evCat"><option value="personal">🙋 Personal</option></select>
+    </div>
+  </div>
+  <div class="fg"><label class="fl">Notas</label><textarea id="evNotes" placeholder="Detalles del evento..."></textarea></div>
+  <div class="fg"><label class="fl">Repetir</label>
+    <select class="fi" id="evRecurring">
+      <option value="none">No repetir</option>
+      <option value="daily">Diario</option>
+      <option value="weekly">Semanal</option>
+      <option value="monthly">Mensual</option>
+    </select>
+  </div>
+  <input type="hidden" id="evId"/>
+  <button class="btn bp bfu" onclick="saveEvent()">💾 Guardar evento</button>
+  <button class="btn br bfu" id="evDelBtn" style="display:none;margin-top:6px" onclick="delEvent()">🗑️ Eliminar</button>
+</div></div>
+
+<div class="ov" id="mTask" style="display:none" onclick="if(event.target===this)hideM('mTask')">
+<div class="mbox">
+  <div class="mt">✅ Tarea <button class="mc" onclick="hideM('mTask')">✕</button></div>
+  <div class="fg"><label class="fl">Título *</label><input class="fi" id="tkTitle" placeholder="¿Qué tienes que hacer?"/></div>
+  <div class="fg"><label class="fl">Descripción</label><textarea id="tkDesc" placeholder="Detalles..."></textarea></div>
+  <div class="fr">
+    <div class="fg"><label class="fl">Prioridad</label>
+      <select class="fi" id="tkPri">
+        <option value="urgent">🔴 Urgente</option>
+        <option value="high">🟡 Alta</option>
+        <option value="normal" selected>🔵 Normal</option>
+        <option value="low">🟢 Baja</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Fecha límite</label><input class="fi" id="tkDue" type="date"/></div>
+  </div>
+  <div class="fg"><label class="fl">Área</label>
+    <select class="fi" id="tkCat"><option value="personal">🙋 Personal</option></select>
+  </div>
+  <div class="fg"><label class="fl">Estado</label>
+    <select class="fi" id="tkStatus">
+      <option value="pending">⏳ Pendiente</option>
+      <option value="progress">🔄 En progreso</option>
+      <option value="done">✅ Completada</option>
+    </select>
+  </div>
+  <input type="hidden" id="tkId"/>
+  <button class="btn bp bfu" onclick="saveTask()">💾 Guardar tarea</button>
+  <button class="btn br bfu" id="tkDelBtn" style="display:none;margin-top:6px" onclick="delTask()">🗑️ Eliminar</button>
+</div></div>
+
+<div class="ov" id="mGoal" style="display:none" onclick="if(event.target===this)hideM('mGoal')">
+<div class="mbox">
+  <div class="mt">🎯 Objetivo <button class="mc" onclick="hideM('mGoal')">✕</button></div>
+  <div class="fg"><label class="fl">Título *</label><input class="fi" id="glTitle" placeholder="¿Qué quieres lograr?"/></div>
+  <div class="fg"><label class="fl">Descripción</label><textarea id="glDesc" placeholder="¿Por qué es importante para ti?..."></textarea></div>
+  <div class="fr">
+    <div class="fg"><label class="fl">Área</label>
+      <select class="fi" id="glCat">
+        <option value="financiero">💰 Financiero</option>
+        <option value="personal">🙋 Personal</option>
+        <option value="negocio">💼 Negocio</option>
+        <option value="salud">💚 Salud</option>
+        <option value="familia">👨‍👩‍👧 Familia</option>
+        <option value="aprendizaje">📚 Aprendizaje</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Fecha límite</label><input class="fi" id="glDate" type="date"/></div>
+  </div>
+  <div class="fg"><label class="fl">Importancia</label>
+    <select class="fi" id="glImp">
+      <option value="high">🔥 Alta — cambia mi vida</option>
+      <option value="medium" selected>⚡ Media — muy importante</option>
+      <option value="low">💡 Baja — me gustaría lograrlo</option>
+    </select>
+  </div>
+  <input type="hidden" id="glId"/>
+  <button class="btn bp bfu" onclick="saveGoal()">💾 Guardar objetivo</button>
+  <button class="btn br bfu" id="glDelBtn" style="display:none;margin-top:6px" onclick="delGoal()">🗑️ Eliminar</button>
+</div></div>
+
+<div class="ov" id="mHabit" style="display:none" onclick="if(event.target===this)hideM('mHabit')">
+<div class="mbox">
+  <div class="mt">💪 Hábito <button class="mc" onclick="hideM('mHabit')">✕</button></div>
+  <div class="fr">
+    <div class="fg"><label class="fl">Emoji</label><input class="fi" id="hbEmo" placeholder="💪" style="text-align:center;font-size:22px"/></div>
+    <div class="fg" style="flex:3"><label class="fl">Nombre *</label><input class="fi" id="hbName" placeholder="Ejercicio, Leer, Meditar..."/></div>
+  </div>
+  <div class="fg"><label class="fl">Área</label>
+    <select class="fi" id="hbCat"><option value="salud">💚 Salud</option></select>
+  </div>
+  <div class="fg"><label class="fl">Color</label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="hbColorPicker">
+      <div onclick="selHabColor('#10b981')" style="width:28px;height:28px;border-radius:50%;background:#10b981;cursor:pointer;border:2px solid transparent" data-color="#10b981"></div>
+      <div onclick="selHabColor('#3b82f6')" style="width:28px;height:28px;border-radius:50%;background:#3b82f6;cursor:pointer;border:2px solid transparent" data-color="#3b82f6"></div>
+      <div onclick="selHabColor('#a855f7')" style="width:28px;height:28px;border-radius:50%;background:#a855f7;cursor:pointer;border:2px solid transparent" data-color="#a855f7"></div>
+      <div onclick="selHabColor('#f43f5e')" style="width:28px;height:28px;border-radius:50%;background:#f43f5e;cursor:pointer;border:2px solid transparent" data-color="#f43f5e"></div>
+      <div onclick="selHabColor('#fbbf24')" style="width:28px;height:28px;border-radius:50%;background:#fbbf24;cursor:pointer;border:2px solid transparent" data-color="#fbbf24"></div>
+      <div onclick="selHabColor('#06b6d4')" style="width:28px;height:28px;border-radius:50%;background:#06b6d4;cursor:pointer;border:2px solid transparent" data-color="#06b6d4"></div>
+      <div onclick="selHabColor('#f97316')" style="width:28px;height:28px;border-radius:50%;background:#f97316;cursor:pointer;border:2px solid transparent" data-color="#f97316"></div>
+    </div>
+    <input type="hidden" id="hbColor" value="#10b981"/>
+  </div>
+  <input type="hidden" id="hbId"/>
+  <button class="btn bp bfu" onclick="saveHabit()">💾 Guardar hábito</button>
+  <button class="btn br bfu" id="hbDelBtn" style="display:none;margin-top:6px" onclick="delHabit()">🗑️ Eliminar</button>
+</div></div>
+
+<div class="ov" id="mJournal" style="display:none" onclick="if(event.target===this)hideM('mJournal')">
+<div class="mbox">
+  <div class="mt">📓 Entrada del diario <button class="mc" onclick="hideM('mJournal')">✕</button></div>
+  <div class="fg"><label class="fl">Fecha</label><input class="fi" id="jDate" type="date"/></div>
+  <div class="fg"><label class="fl">¿Cómo te sientes hoy?</label>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button class="mood-btn" data-mood="🤩" onclick="selMood('🤩')">🤩</button>
+      <button class="mood-btn" data-mood="😊" onclick="selMood('😊')">😊</button>
+      <button class="mood-btn" data-mood="😐" onclick="selMood('😐')">😐</button>
+      <button class="mood-btn" data-mood="😔" onclick="selMood('😔')">😔</button>
+      <button class="mood-btn" data-mood="😤" onclick="selMood('😤')">😤</button>
+    </div>
+    <input type="hidden" id="jMood" value="😊"/>
+  </div>
+  <div class="fg"><label class="fl">¿Qué pasó hoy? ¿Qué aprendiste?</label><textarea id="jText" rows="5" placeholder="Escribe libremente..."></textarea></div>
+  <div class="fg"><label class="fl">3 cosas buenas de hoy</label><textarea id="jGood" rows="3" placeholder="1. ...\n2. ...\n3. ..."></textarea></div>
+  <input type="hidden" id="jId"/>
+  <button class="btn bp bfu" onclick="saveJournal()">💾 Guardar entrada</button>
+  <button class="btn br bfu" id="jDelBtn" style="display:none;margin-top:6px" onclick="delJournal()">🗑️ Eliminar</button>
+</div></div>
+
+<div class="ov" id="mStep" style="display:none" onclick="if(event.target===this)hideM('mStep')">
+<div class="mbox">
+  <div class="mt">📌 Agregar paso <button class="mc" onclick="hideM('mStep')">✕</button></div>
+  <div class="fg"><label class="fl">Descripción del paso *</label><input class="fi" id="stepText" placeholder="¿Qué harás para avanzar?"/></div>
+  <div class="fg"><label class="fl">Fecha límite (opcional)</label><input class="fi" id="stepDue" type="date"/></div>
+  <input type="hidden" id="stepGoalId"/>
+  <button class="btn bp bfu" onclick="saveStep()">💾 Agregar paso</button>
+</div></div>
+
+<div class="ov" id="mNote" style="display:none" onclick="if(event.target===this)hideM('mNote')">
+<div class="mbox">
+  <div class="mt">📝 Nota en objetivo <button class="mc" onclick="hideM('mNote')">✕</button></div>
+  <div class="fg"><label class="fl">Nota / avance / reflexión</label><textarea id="noteText" rows="4" placeholder="¿Cómo vas? ¿Qué aprendiste? ¿Qué obstáculos encontraste?..."></textarea></div>
+  <input type="hidden" id="noteGoalId"/>
+  <button class="btn bp bfu" onclick="saveGoalNote()">💾 Guardar nota</button>
+</div></div>
+
+<script>
+// ─── HELPERS ────────────────────────────────────────────────────
+function ge(id){return document.getElementById(id);}
+function getV(id){var e=ge(id);return e?e.value:'';}
+function setV(id,v){var e=ge(id);if(e)e.value=v;}
+function ld(k,d){try{var v=localStorage.getItem('los_'+k);return v!==null?JSON.parse(v):d;}catch(e){return d;}}
+function sv(k,v){try{localStorage.setItem('los_'+k,JSON.stringify(v));}catch(e){}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function fmtDate(d){if(!d)return '';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function fmtDateShort(d){if(!d)return '';var p=d.split('-');var ms=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];return p[2]+' '+ms[parseInt(p[1])-1];}
+function daysUntil(d){if(!d)return null;var t=new Date(d+'T12:00:00'),n=new Date();n.setHours(12,0,0,0);return Math.round((t-n)/(1000*60*60*24));}
+function toast(msg,col){var ct=ge('toast-ct');if(!ct)return;var t=document.createElement('div');t.className='toast';t.textContent=msg;if(col)t.style.color=col;ct.appendChild(t);setTimeout(()=>t.remove(),3200);}
+function showM(id){var e=ge(id);if(e)e.style.display='flex';}
+function hideM(id){var e=ge(id);if(e)e.style.display='none';}
+function cel(t){return document.createElement(t);}
+function getCatEmoji(id){var a=(S.areas||[]).find(function(x){return x.id===id;});return a?a.emoji:'📌';}
+function getCatColor(id){var a=(S.areas||[]).find(function(x){return x.id===id;});return a?a.color:'#7c3aed';}
+// Keep backward compat
+var CAT_EMOJI={};var CAT_COL={};
+function refreshCatMaps(){CAT_EMOJI={};CAT_COL={};(S.areas||[]).forEach(function(a){CAT_EMOJI[a.id]=a.emoji;CAT_COL[a.id]=a.color;});}
+var PRI_LABEL={urgent:'🔴 Urgente',high:'🟡 Alta',normal:'🔵 Normal',low:'🟢 Baja'};
+var MS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+var DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+var _charts={};
+function dc(id){if(_charts[id]){_charts[id].destroy();delete _charts[id];}}
+
+// ─── STATE ────────────────────────────────────────────────────
+var S={
+  pass:ld('pass','1234'),
+  name:ld('name',''),
+  pin:ld('pin',null),
+  googleClientId:ld('googleClientId','129798170458-ppgbdffb1mom8dvt116k3nuig0loffhj.apps.googleusercontent.com'),
+  events:ld('events',[]),
+  tasks:ld('tasks',[]),
+  goals:ld('goals',[]),
+  habits:ld('habits',[]),
+  habitLog:ld('habitLog',{}),
+  journal:ld('journal',[]),
+  patHistory:ld('patHistory',[]),
+  financeCache:ld('financeCache',null),
+  financeSynced:ld('financeSynced',null),
+  areas:ld('areas',[
+    {id:'financiero', name:'Financiero',  emoji:'💰', color:'#fbbf24'},
+    {id:'personal',   name:'Personal',    emoji:'🙋', color:'#ec4899'},
+    {id:'negocio',    name:'Negocio',     emoji:'💼', color:'#3b82f6'},
+    {id:'salud',      name:'Salud',       emoji:'💚', color:'#10b981'},
+    {id:'familia',    name:'Familia',     emoji:'👨‍👩‍👧', color:'#f97316'},
+    {id:'aprendizaje',name:'Aprendizaje', emoji:'📚', color:'#8b5cf6'},
+    {id:'mental',     name:'Mental',      emoji:'🧠', color:'#06b6d4'},
+    {id:'espiritual', name:'Espiritual',  emoji:'🙏', color:'#a78bfa'},
+    {id:'creatividad',name:'Creatividad', emoji:'🎨', color:'#f43f5e'},
+    {id:'social',     name:'Social',      emoji:'🤝', color:'#22d3ee'}
+  ]),
+  theme:ld('theme','cosmos'),
+  accent:ld('accent','#7c3aed'),
+  fontSize:ld('fontSize','normal'),
+  // UI
+  calM:new Date().getMonth(),
+  calY:new Date().getFullYear(),
+  selDate:todayStr(),
+  taskFilter:'all',
+  goalFilter:'all',
+  selGoal:null,
+  selHabColor:'#10b981'
+};
+
+function persist(){
+  sv('pass',S.pass);sv('name',S.name);sv('pin',S.pin);
+  sv('googleClientId',S.googleClientId);
+  sv('events',S.events);sv('tasks',S.tasks);sv('goals',S.goals);
+  sv('habits',S.habits);sv('habitLog',S.habitLog);
+  sv('journal',S.journal);sv('patHistory',S.patHistory);
+  sv('financeCache',S.financeCache);sv('financeSynced',S.financeSynced);
+  sv('areas',S.areas);
+  sv('theme',S.theme);sv('accent',S.accent);sv('fontSize',S.fontSize);
+  drvAutoSave();
+}
+
+
+
+// ─── THEMES ────────────────────────────────────────────────────
+var THEMES = {
+  cosmos:   {name:'🌌 Cosmos',   bg:'#0a0f1e',c1:'#0d1426',c2:'#111827',c3:'#1e2a3a',c4:'#253347',acc:'#7c3aed',acc2:'#a855f7',acc3:'#6d28d9'},
+  ocean:    {name:'🌊 Océano',   bg:'#051525',c1:'#071e35',c2:'#0a2540',c3:'#0f3460',c4:'#164984',acc:'#0ea5e9',acc2:'#38bdf8',acc3:'#0284c7'},
+  jungle:   {name:'🌿 Selva',    bg:'#071510',c1:'#0a1f14',c2:'#0f2a1a',c3:'#154021',c4:'#1a5228',acc:'#16a34a',acc2:'#22c55e',acc3:'#15803d'},
+  volcano:  {name:'🔥 Volcán',   bg:'#1a0a00',c1:'#251208',c2:'#2d1a0a',c3:'#3d2510',c4:'#4d3015',acc:'#ea580c',acc2:'#f97316',acc3:'#c2410c'},
+  amoled:   {name:'⚫ AMOLED',   bg:'#000000',c1:'#080808',c2:'#101010',c3:'#181818',c4:'#202020',acc:'#7c3aed',acc2:'#a855f7',acc3:'#6d28d9'},
+  aurora:   {name:'🌸 Aurora',   bg:'#150a1e',c1:'#1e0d2a',c2:'#261035',c3:'#381545',c4:'#4a1a58',acc:'#ec4899',acc2:'#f472b6',acc3:'#db2777'},
+  midnight: {name:'🌙 Midnight', bg:'#000814',c1:'#001524',c2:'#00253a',c3:'#003554',c4:'#006494',acc:'#00b4d8',acc2:'#90e0ef',acc3:'#0096c7'},
+  light:    {name:'☀️ Claro',    bg:'#f0f4f8',c1:'#ffffff',c2:'#f8fafc',c3:'#e2e8f0',c4:'#cbd5e1',acc:'#7c3aed',acc2:'#6d28d9',acc3:'#5b21b6',txt:'#1e293b',soft:'#64748b',mut:'#94a3b8',c3b:'1px solid #e2e8f0'}
+};
+
+function applyTheme(name, customAccent) {
+  var t = THEMES[name] || THEMES.cosmos;
+  var r = document.documentElement.style;
+  r.setProperty('--bg',   t.bg);
+  r.setProperty('--c1',   t.c1);
+  r.setProperty('--c2',   t.c2);
+  r.setProperty('--c3',   t.c3);
+  r.setProperty('--c4',   t.c4);
+  var a = customAccent || t.acc;
+  r.setProperty('--acc',  a);
+  r.setProperty('--acc2', customAccent ? lightenColor(customAccent, 20) : t.acc2);
+  r.setProperty('--acc3', customAccent ? darkenColor(customAccent, 15) : t.acc3);
+  r.setProperty('--cv',   customAccent ? lightenColor(customAccent, 10) : (t.acc2 || a));
+  r.setProperty('--txt',  t.txt  || '#f1f5f9');
+  r.setProperty('--soft', t.soft || '#8fa3b1');
+  r.setProperty('--mut',  t.mut  || '#4a5568');
+  // Sidebar also needs text update for light theme
+  var snav = ge('snav');
+  if(snav) snav.style.color = t.txt || '#f1f5f9';
+}
+
+function lightenColor(hex, pct) {
+  var num = parseInt(hex.slice(1), 16);
+  var r = Math.min(255, (num>>16) + Math.round(2.55*pct));
+  var g = Math.min(255, ((num>>8)&0xff) + Math.round(2.55*pct));
+  var b = Math.min(255, (num&0xff) + Math.round(2.55*pct));
+  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+function darkenColor(hex, pct) {
+  var num = parseInt(hex.slice(1), 16);
+  var r = Math.max(0, (num>>16) - Math.round(2.55*pct));
+  var g = Math.max(0, ((num>>8)&0xff) - Math.round(2.55*pct));
+  var b = Math.max(0, (num&0xff) - Math.round(2.55*pct));
+  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+function setTheme(name) {
+  if(!THEMES[name]) return;
+  S.theme = name;
+  S.accent = THEMES[name].acc; // always use theme's own accent when switching
+  applyTheme(name, S.accent);
+  persist();
+  renderThemeGrid();
+  updateFontBtns();
+  // Update accent picker to match new theme
+  var ap = ge('accentPicker');
+  if(ap) { ap.value = S.accent; }
+  var al = ge('accentLabel');
+  if(al) al.textContent = S.accent;
+  toast('Tema '+THEMES[name].name+' aplicado ✓');
+}
+
+function previewAccent(color) {
+  document.documentElement.style.setProperty('--acc', color);
+  document.documentElement.style.setProperty('--acc2', lightenColor(color, 15));
+  document.documentElement.style.setProperty('--acc3', darkenColor(color, 10));
+  var lbl = ge('accentLabel'); if(lbl) lbl.textContent = color;
+}
+
+function applyCustomAccent(color) {
+  S.accent = color;
+  applyTheme(S.theme, color);
+  persist();
+  renderThemeGrid();
+  var al = ge('accentLabel'); if(al) al.textContent = color;
+  toast('Color de acento aplicado ✓');
+}
+
+function resetAccent() {
+  var def = (THEMES[S.theme]||THEMES.cosmos).acc;
+  S.accent = def;
+  var ap = ge('accentPicker'); if(ap) ap.value = def;
+  applyTheme(S.theme, def);
+  persist();
+  toast('Color restablecido');
+}
+
+function setFontSize(size) {
+  S.fontSize = size;
+  var sizes = {small:'13px', normal:'15px', large:'17px'};
+  document.body.style.fontSize = sizes[size]||'15px';
+  persist();
+  updateFontBtns();
+  toast('Tamaño de texto aplicado ✓');
+}
+
+function updateFontBtns() {
+  ['small','normal','large'].forEach(function(s) {
+    var b = ge('fs-'+s);
+    if(!b) return;
+    if(S.fontSize===s) {
+      b.style.background='var(--acc)';
+      b.style.color='#fff';
+      b.style.borderColor='var(--acc)';
+    } else {
+      b.style.background='var(--c3)';
+      b.style.color='var(--txt)';
+      b.style.borderColor='transparent';
+    }
+  });
+}
+
+function renderThemeGrid() {
+  var el = ge('themeGrid'); if(!el) return;
+  el.innerHTML = Object.keys(THEMES).map(function(key) {
+    var t = THEMES[key];
+    var active = S.theme === key;
+    return '<div data-themekey="'+key+'" onclick="setThemeFromEl(this)" style="cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid '+(active?'var(--acc2)':'transparent')+';transition:.2s;box-shadow:'+(active?'0 0 0 2px var(--acc2)':'none')+'">'+
+      '<div style="background:'+t.bg+';padding:8px 6px;text-align:center">'+
+        '<div style="display:flex;gap:2px;justify-content:center;margin-bottom:4px">'+
+          '<div style="width:8px;height:8px;border-radius:50%;background:'+t.acc+'"></div>'+
+          '<div style="width:8px;height:8px;border-radius:50%;background:'+t.acc2+'"></div>'+
+          '<div style="width:8px;height:8px;border-radius:50%;background:'+(t.txt||'#f1f5f9')+'22"></div>'+
+        '</div>'+
+        '<div style="background:'+t.c1+';border-radius:4px;padding:3px;margin-bottom:3px">'+
+          '<div style="height:3px;background:'+t.acc+';border-radius:2px;margin-bottom:2px"></div>'+
+          '<div style="height:2px;background:'+(t.txt||'#f1f5f9')+'33;border-radius:2px"></div>'+
+        '</div>'+
+        '<div style="font-size:9px;font-weight:700;color:'+(t.txt||'#f1f5f9')+';opacity:.8;white-space:nowrap">'+t.name+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+function setThemeFromEl(el){setTheme(el.getAttribute('data-themekey'));}
+
+
+
+// ─── AREAS MANAGEMENT ─────────────────────────────────────────
+function areaOptions(selectedId){
+  return (S.areas||[]).map(function(a){
+    return '<option value="'+a.id+'"'+(a.id===selectedId?' selected':'')+'>'+a.emoji+' '+a.name+'</option>';
+  }).join('');
+}
+
+function renderAreaSettings(){
+  var el=ge('areaList');if(!el)return;
+  el.innerHTML=(S.areas||[]).map(function(a){
+    return '<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--c2);border-radius:10px;margin-bottom:6px">'+
+      '<div style="width:10px;height:10px;border-radius:50%;background:'+a.color+';flex-shrink:0"></div>'+
+      '<span style="font-size:18px">'+a.emoji+'</span>'+
+      '<span style="flex:1;font-size:13px;font-weight:600">'+a.name+'</span>'+
+      '<button class="btn bs bsm" data-aid="'+a.id+'" onclick="editArea(this.dataset.aid)" style="padding:4px 8px">✏️</button>'+
+      '<button class="btn br bsm" data-aid="'+a.id+'" onclick="delArea(this.dataset.aid)" style="padding:4px 8px">🗑️</button>'+
+      '</div>';
+  }).join('');
+}
+
+function openAreaModal(id){
+  var a=id?S.areas.find(function(x){return x.id===id;}):null;
+  setV('areaId',id||'');
+  setV('areaName',a?a.name:'');
+  setV('areaEmoji',a?a.emoji:'');
+  setV('areaColor',a?a.color:'#7c3aed');
+  ge('areaColorDot').style.background=a?a.color:'#7c3aed';
+  showM('mArea');
+}
+function editArea(id){openAreaModal(id);}
+
+function saveArea(){
+  var name=getV('areaName').trim();
+  var emoji=getV('areaEmoji').trim()||'📌';
+  var color=getV('areaColor')||'#7c3aed';
+  if(!name)return toast('Escribe el nombre del área','#f43f5e');
+  var id=getV('areaId');
+  if(id){
+    S.areas=S.areas.map(function(a){return a.id===id?{id:id,name:name,emoji:emoji,color:color}:a;});
+    toast('Área actualizada ✓');
+  } else {
+    var newId=name.toLowerCase().replace(/[^a-z0-9]/g,'_')+'_'+Date.now().toString(36);
+    S.areas.push({id:newId,name:name,emoji:emoji,color:color});
+    toast('Área creada ✓');
+  }
+  refreshCatMaps();
+  persist();hideM('mArea');renderAreaSettings();
+}
+
+function delArea(id){
+  var a=S.areas.find(function(x){return x.id===id;});
+  if(!a)return;
+  if(!confirm('¿Eliminar el área "'+a.name+'"? Los elementos que la usan quedarán sin área pero no se borrarán.'))return;
+  S.areas=S.areas.filter(function(x){return x.id!==id;});
+  refreshCatMaps();
+  persist();renderAreaSettings();
+  toast('Área eliminada','#f97316');
+}
+
+// ─── MANTENIMIENTO ─────────────────────────────────────────────
+function calcStorage(){
+  var total=0;var detail=[];
+  var items={
+    'Eventos':S.events,'Tareas':S.tasks,'Metas':S.goals,
+    'Hábitos':S.habits,'Log hábitos':S.habitLog,'Diario':S.journal,
+    'Finanzas cache':S.financeCache
+  };
+  Object.keys(items).forEach(k=>{
+    var size=new Blob([JSON.stringify(items[k]||[])]).size;
+    total+=size;detail.push({k,size});
+  });
+  var pct=Math.min(100,(total/(5*1024*1024)*100)).toFixed(1);
+  var sf=ge('storageFill');if(sf)sf.style.width=pct+'%';
+  if(sf)sf.style.background=pct>80?'var(--rd)':pct>50?'var(--yw)':'var(--gr)';
+  var sd=ge('storageDetail');
+  if(sd)sd.innerHTML=detail.map(d=>'<span style="margin-right:8px">'+d.k+': <b>'+(d.size/1024).toFixed(1)+'KB</b></span>').join('')+
+    '<br><b>Total: '+(total/1024).toFixed(1)+'KB de ~5,120KB disponibles ('+pct+'%)</b>';
+  var sb=ge('storageBar');if(sb)sb.style.display='block';
+  // Update counts
+  var tc=ge('taskCount');if(tc)tc.textContent=S.tasks.filter(t=>t.status==='done').length+' completadas registradas';
+  var hlc=ge('habitLogCount');if(hlc)hlc.textContent=Object.keys(S.habitLog).length+' días de historial';
+  var jc=ge('journalCount');if(jc)jc.textContent=S.journal.length+' entradas guardadas';
+  var gc=ge('goalArchiveCount');if(gc)gc.textContent=S.goals.filter(g=>g.status!=='active').length+' metas no activas';
+}
+
+function cleanTasks(){
+  var days=parseInt(getV('taskCleanRange'))||90;
+  var cutoff=new Date();cutoff.setDate(cutoff.getDate()-days);
+  var cutStr=cutoff.toISOString().slice(0,10);
+  var before=S.tasks.length;
+  if(days===0){
+    if(!confirm('¿Eliminar TODAS las tareas completadas? Esta acción no se puede deshacer.'))return;
+    S.tasks=S.tasks.filter(t=>t.status!=='done');
+  } else {
+    if(!confirm('¿Eliminar tareas completadas hace más de '+days+' días?'))return;
+    S.tasks=S.tasks.filter(t=>t.status!=='done'||(t.completedAt&&t.completedAt>=cutStr));
+  }
+  var removed=before-S.tasks.length;
+  persist();calcStorage();renderTareas();
+  toast('✓ '+removed+' tareas eliminadas');
+}
+
+function cleanHabitLog(){
+  var months=parseInt(getV('habitCleanRange'))||6;
+  var cutoff=new Date();cutoff.setMonth(cutoff.getMonth()-months);
+  var cutStr=cutoff.toISOString().slice(0,10);
+  if(!confirm('¿Eliminar historial de hábitos anterior a '+months+' meses? Los hábitos se conservan, solo se borra el historial antiguo.'))return;
+  var before=Object.keys(S.habitLog).length;
+  var cleaned={};
+  Object.keys(S.habitLog).forEach(d=>{if(d>=cutStr)cleaned[d]=S.habitLog[d];});
+  S.habitLog=cleaned;
+  var removed=before-Object.keys(S.habitLog).length;
+  persist();calcStorage();
+  toast('✓ '+removed+' días de historial eliminados');
+}
+
+function cleanJournal(){
+  var months=parseInt(getV('journalCleanRange'))||6;
+  var cutoff=new Date();cutoff.setMonth(cutoff.getMonth()-months);
+  var cutStr=cutoff.toISOString().slice(0,10);
+  if(!confirm('¿Eliminar entradas del diario anteriores a '+months+' meses? ('+S.journal.filter(j=>j.date<cutStr).length+' entradas)'))return;
+  var before=S.journal.length;
+  S.journal=S.journal.filter(j=>j.date>=cutStr);
+  var removed=before-S.journal.length;
+  persist();calcStorage();renderJournal();
+  toast('✓ '+removed+' entradas eliminadas');
+}
+
+function cleanGoals(){
+  var nonActive=S.goals.filter(g=>g.status!=='active').length;
+  if(!nonActive)return toast('No hay metas pausadas o logradas','#fbbf24');
+  if(!confirm('¿Eliminar '+nonActive+' metas (logradas y pausadas)? Las activas no se tocan.'))return;
+  S.goals=S.goals.filter(g=>g.status==='active');
+  if(S.selGoal&&!S.goals.find(g=>g.id===S.selGoal))S.selGoal=null;
+  persist();calcStorage();renderMetas();renderDash();
+  toast('✓ '+nonActive+' metas eliminadas');
+}
+
+function nukeAll(){
+  if(!confirm('⚠️ ÚLTIMA ADVERTENCIA\n\n¿Borrar absolutamente todos tus datos?\n\nEsto borra eventos, tareas, metas, hábitos, diario y configuración.\n\nAsegúrate de haber guardado en Drive primero.'))return;
+  if(!confirm('¿Estás completamente seguro? Esta acción NO SE PUEDE DESHACER.'))return;
+  S.events=[];S.tasks=[];S.goals=[];S.habits=[];
+  S.habitLog={};S.journal=[];S.patHistory=[];
+  S.financeCache=null;S.financeSynced=null;
+  S.selGoal=null;
+  persist();initApp();renderDash();
+  toast('Todos los datos eliminados','#f97316');
+}
+
+// ─── FINANCEOS INTEGRATION ────────────────────────────────────
+function syncFinanceOS(){
+  if(!GD.TK) return toast('Conecta Google Drive primero','#f43f5e');
+  var st=ge('finSyncStatus');if(st)st.innerHTML='<span style="color:var(--yw)">⏳ Buscando datos de FinanceOS...</span>';
+  fetch('https://www.googleapis.com/drive/v3/files?q=name%3D%22financeos_v5.json%22&spaces=drive',
+    {headers:{'Authorization':'Bearer '+GD.TK}})
+  .then(r=>r.json()).then(d=>{
+    if(!d.files||!d.files.length){
+      if(st)st.innerHTML='<span style="color:var(--rd)">❌ No se encontró el archivo de FinanceOS en Drive. Asegúrate de haber guardado desde FinanceOS primero.</span>';
+      return;
+    }
+    var fid=d.files[0].id;
+    return fetch('https://www.googleapis.com/drive/v3/files/'+fid+'?alt=media',
+      {headers:{'Authorization':'Bearer '+GD.TK}});
+  }).then(r=>r.json()).then(data=>{
+    S.financeCache=data;
+    S.financeSynced=new Date().toLocaleString('es-MX');
+    sv('financeCache',S.financeCache);sv('financeSynced',S.financeSynced);
+  sv('areas',S.areas);
+  sv('theme',S.theme);sv('accent',S.accent);sv('fontSize',S.fontSize);
+    if(st)st.innerHTML='<span style="color:var(--gr)">✅ Sincronizado: '+S.financeSynced+'</span>';
+    renderFinWidget();renderDash();
+    toast('✅ Datos financieros actualizados');
+  }).catch(e=>{
+    if(st)st.innerHTML='<span style="color:var(--rd)">❌ Error al sincronizar: '+e.message+'</span>';
+    toast('Error al sincronizar FinanceOS','#f43f5e');
+  });
+}
+
+function calcFinance(d){
+  if(!d) return null;
+  var banks=d.banks||[], goals=d.goals||[], invs=d.invs||[], loans=d.loans||[];
+  var bizList=d.bizList||[], bizInv=d.bizInv||{}, bizProfit=d.bizProfit||{};
+  var bkTot=banks.filter(b=>b.type!=='Crédito').reduce((s,b)=>s+(b.balance||0),0);
+  var goalTot=goals.reduce((s,g)=>s+(g.saved||0),0);
+  var invTot=invs.reduce((s,i)=>s+(i.amount||0),0);
+  var debtTot=loans.filter(l=>l.dir==='debt').reduce((s,l)=>s+Math.max(((l.total||0)-(l.paid||0)),0),0);
+  var bizInvTot=bizList.reduce((a,bz)=>a+((bizInv[bz.id]||[]).reduce((s,r)=>s+(r.amount||0),0)),0);
+  var bizProfTot=bizList.reduce((a,bz)=>a+((bizProfit[bz.id]||[]).reduce((s,r)=>s+(r.amount||0),0)),0);
+  var bizNet=bizProfTot-bizInvTot;
+  var pat=bkTot+goalTot+invTot-debtTot+bizNet;
+  var creditCards=banks.filter(b=>b.type==='Crédito');
+  var credUsed=creditCards.reduce((s,b)=>s+(b.balance||0),0);
+  return {pat,bkTot,goalTot,invTot,debtTot,bizNet,bizList,goals,credUsed,banks,bizInv,bizProfit};
+}
+
+function fmt2(n){
+  var x=Number(n)||0;
+  if(Math.abs(x)>=1000000) return '$'+(x/1000000).toFixed(1)+'M';
+  if(Math.abs(x)>=1000) return '$'+(x/1000).toFixed(1)+'k';
+  return '$'+x.toFixed(0);
+}
+
+function renderFinWidget(){
+  var el=ge('finWidget');if(!el)return;
+  if(!S.financeCache){
+    el.innerHTML='<div style="background:var(--c2);border:1px dashed var(--c3);border-radius:14px;padding:12px;margin-bottom:10px;text-align:center">'+
+      '<div style="font-size:12px;color:var(--mut);margin-bottom:6px">💰 Sin datos de FinanceOS</div>'+
+      '<button class="btn bp bsm" onclick="showPg(&quot;pg-s&quot;)">Conectar FinanceOS →</button>'+
+      '</div>';
+    return;
+  }
+  var f=calcFinance(S.financeCache);if(!f)return;
+  // Goals with progress
+  var goalsHTML=(f.goals||[]).filter(g=>g.target&&g.target>0).slice(0,3).map(g=>{
+    var pct=Math.min(100,Math.round((g.saved||0)/g.target*100));
+    return '<div style="margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">'+
+        '<span>'+(g.emoji||'🎯')+' '+g.name+'</span>'+
+        '<span style="color:var(--gr)">'+fmt2(g.saved||0)+' / '+fmt2(g.target)+'</span>'+
+      '</div>'+
+      '<div class="pbar"><div class="pbar-fill" style="width:'+pct+'%;background:'+(pct>=80?'var(--gr)':pct>=40?'var(--yw)':'var(--acc2)')+'"></div></div>'+
+      '</div>';
+  }).join('');
+  // Biz summary
+  var bizHTML='';
+  if(f.bizList&&f.bizList.length){
+    bizHTML='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--soft);margin:10px 0 6px">🏪 Negocios</div>'+
+    f.bizList.map(bz=>{
+      var inv=(f.bizInv[bz.id]||[]).reduce((s,r)=>s+(r.amount||0),0);
+      var prof=(f.bizProfit[bz.id]||[]).reduce((s,r)=>s+(r.amount||0),0);
+      var net=prof-inv;
+      return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--c3)">'+
+        '<span>'+(bz.emoji||'🏪')+' '+bz.name+'</span>'+
+        '<span style="font-weight:700;color:'+(net>=0?'var(--gr)':'var(--rd)')+'">'+fmt2(net)+'</span>'+
+        '</div>';
+    }).join('');
+  }
+  el.innerHTML='<div style="background:linear-gradient(135deg,#0d1a2e,#1a0d2e);border:1px solid rgba(124,58,237,.3);border-radius:14px;padding:14px;margin-bottom:10px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
+      '<div style="font-size:12px;font-weight:700;color:var(--acc2)">💰 Resumen FinanceOS</div>'+
+      '<div style="display:flex;gap:6px;align-items:center">'+
+        (S.financeSynced?'<span style="font-size:9px;color:var(--mut)">'+S.financeSynced+'</span>':'')+
+        '<button class="btn bs bsm" style="padding:3px 8px;font-size:10px" onclick="syncFinanceOS()">🔄</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="g4" style="margin-bottom:10px">'+
+      '<div class="sc"><div class="sl">Patrimonio</div><div class="sv" style="font-size:14px;color:'+(f.pat>=0?'var(--gr)':'var(--rd)')+'">'+fmt2(f.pat)+'</div></div>'+
+      '<div class="sc"><div class="sl">Bancos</div><div class="sv" style="font-size:14px;color:var(--bl)">'+fmt2(f.bkTot)+'</div></div>'+
+      '<div class="sc"><div class="sl">Inversiones</div><div class="sv" style="font-size:14px;color:var(--cv)">'+fmt2(f.invTot)+'</div></div>'+
+      '<div class="sc"><div class="sl">Deudas</div><div class="sv" style="font-size:14px;color:var(--rd)">'+fmt2(f.debtTot)+'</div></div>'+
+    '</div>'+
+    (goalsHTML?'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--soft);margin-bottom:6px">🎯 Metas de ahorro</div>'+goalsHTML:'')+
+    bizHTML+
+    '</div>';
+}
+
+// ─── LOGIN ────────────────────────────────────────────────────
+function doLogin(){
+  var p=getV('lpass');
+  if(p===S.pass){ge('lw').style.display='none';ge('app').style.display='block';ge('bnav').style.display='flex';initApp();}
+  else toast('Contraseña incorrecta','#f43f5e');
+}
+function doLogout(){ge('app').style.display='none';ge('bnav').style.display='none';ge('lw').style.display='flex';setV('lpass','');}
+function abrirRecPIN(){ge('recPINPanel').style.display=ge('recPINPanel').style.display==='none'?'block':'none';}
+function verificarPINRecovery(){
+  var pin=getV('recPINInput'),np=getV('recNewPass').trim();
+  if(!S.pin)return toast('No tienes PIN configurado','#f43f5e');
+  if(pin!==S.pin)return toast('PIN incorrecto','#f43f5e');
+  if(!np||np.length<3)return toast('Contraseña muy corta','#f43f5e');
+  S.pass=np;persist();ge('recPINPanel').style.display='none';
+  toast('✅ Contraseña cambiada. Ingresa con tu nueva contraseña.');
+}
+
+// ─── CLOCK + AUTO-REFRESH ─────────────────────────────────────
+function tick(){
+  var n=new Date();
+  var h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+  var t=(h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+  var te=ge('hdrTime');if(te)te.textContent=t;
+  // Refresh all every 30s
+  if(s===0||s===30){refreshWidgets();}
+}
+function refreshWidgets(){
+  if(ge('pg-d').classList.contains('on'))renderDash();
+  if(ge('pg-h').classList.contains('on'))renderHabitos();
+}
+setInterval(tick,1000);
+
+// ─── PAGE NAV ─────────────────────────────────────────────────
+var PAGE_MAP={'pg-d':'bn-d','pg-a':'bn-a','pg-t':'bn-t','pg-g':'bn-g','pg-h':'bn-h'};
+function showPg(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.bni').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.snav-item').forEach(b=>b.classList.remove('on'));
+  var pg=ge(id);if(pg)pg.classList.add('on');
+  var bn=PAGE_MAP[id];if(bn){var b=ge(bn);if(b)b.classList.add('on');}
+  var sn=({'pg-d':'sn-d','pg-a':'sn-a','pg-t':'sn-t','pg-g':'sn-g','pg-h':'sn-h','pg-ana':'sn-ana','pg-j':'sn-j','pg-s':'sn-s','pg-help':'sn-help'})[id];
+  if(sn){var sb=ge(sn);if(sb)sb.classList.add('on');}
+  if(id==='pg-d')renderDash();
+  if(id==='pg-a')renderAgenda();
+  if(id==='pg-t')renderTareas();
+  if(id==='pg-g')renderMetas();
+  if(id==='pg-h')renderHabitos();
+  if(id==='pg-ana')renderAna();
+  if(id==='pg-j')renderJournal();
+  if(id==='pg-s'){setV('sGDrive',S.googleClientId);setV('sName',S.name);renderThemeGrid();calcStorage();renderAreaSettings();updateFontBtns();var ap=ge('accentPicker');if(ap)ap.value=S.accent||'#7c3aed';var al=ge('accentLabel');if(al)al.textContent=S.accent||'#7c3aed';var fss=ge('finSyncStatus');if(fss)fss.innerHTML=S.financeSynced?'<span style="color:var(--gr)">✅ Última sync: '+S.financeSynced+'</span>':'<span style="color:var(--mut)">Sin sincronizar aún</span>';}
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────────
+function cambiarPass(){var p=getV('sPass').trim();if(!p||p.length<3)return toast('Mínimo 3 caracteres','#f43f5e');S.pass=p;persist();setV('sPass','');toast('✅ Contraseña actualizada');}
+function guardarPIN(){var p=getV('sPIN').trim();if(!/^\d{4}$/.test(p))return toast('PIN debe ser 4 dígitos','#f43f5e');S.pin=p;persist();setV('sPIN','');toast('✅ PIN guardado');}
+
+// ─── DASHBOARD ────────────────────────────────────────────────
+function renderDash(){
+  var n=new Date();
+  var h=n.getHours();
+  var gr=h<12?'Buenos días':(h<18?'Buenas tardes':'Buenas noches');
+  if(h<12)gr='Buenos días';else if(h<18)gr='Buenas tardes';else gr='Buenas noches';
+  var gEl=ge('greet');if(gEl)gEl.textContent=gr+(S.name?' — '+S.name:'')+'  ☀️';
+  var hd=ge('heroDate');if(hd)hd.textContent=DAYS[n.getDay()]+', '+n.getDate()+' de '+['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][n.getMonth()]+' '+n.getFullYear();
+  var hs=ge('heroSub');
+  // Stats
+  var todT=S.tasks.filter(t=>t.dueDate===todayStr()&&t.status!=='done').length;
+  var actG=S.goals.filter(g=>g.status==='active').length;
+  var todH=S.habits.length;
+  var doneH=S.habits.filter(h2=>S.habitLog[todayStr()]&&S.habitLog[todayStr()][h2.id]).length;
+  if(hs)hs.textContent=todT+' tareas para hoy · '+actG+' objetivos activos · '+doneH+'/'+todH+' hábitos';
+  var dr=ge('dRow');
+  if(dr){
+    var totTasks=S.tasks.filter(t=>t.status!=='done').length;
+    var doneTasks=S.tasks.filter(t=>t.status==='done'&&t.completedAt&&t.completedAt.slice(0,7)===todayStr().slice(0,7)).length;
+    dr.innerHTML=
+      '<div class="hi"><div class="hilbl">Pendientes</div><div class="hival cy">'+totTasks+'</div></div>'+
+      '<div class="hi"><div class="hilbl">Completadas/mes</div><div class="hival cg">'+doneTasks+'</div></div>'+
+      '<div class="hi"><div class="hilbl">Hábitos hoy</div><div class="hival cv">'+doneH+'/'+todH+'</div></div>'+
+      '<div class="hi"><div class="hilbl">Metas activas</div><div class="hival cb">'+actG+'</div></div>';
+  }
+  // Alerts
+  var al='';
+  var overdTasks=S.tasks.filter(t=>t.dueDate&&t.dueDate<todayStr()&&t.status!=='done');
+  if(overdTasks.length)al+='<div class="al ale">⏰ '+overdTasks.length+' tarea(s) vencida(s)</div>';
+  var nearGoals=S.goals.filter(g=>g.status==='active'&&g.targetDate&&daysUntil(g.targetDate)<=7&&daysUntil(g.targetDate)>=0);
+  if(nearGoals.length)al+='<div class="al alw">🎯 '+nearGoals.length+' objetivo(s) con fecha límite en los próximos 7 días</div>';
+  var streak=getStreakAll();
+  if(streak>=7)al+='<div class="al alg">🔥 ¡Llevas '+streak+' días seguidos completando todos tus hábitos!</div>';
+  var da=ge('dAlerts');if(da)da.innerHTML=al;
+  renderFinWidget();
+  // Today's events
+  var todayEvs=getEventsForDate(todayStr());
+  var dt=ge('dToday');
+  if(dt){
+    if(!todayEvs.length)dt.innerHTML='<div style="font-size:12px;color:var(--mut);padding:8px 0">Sin eventos hoy. <span style="color:var(--acc2);cursor:pointer" onclick="openEvent(null,todayStr())">+ Agregar</span></div>';
+    else dt.innerHTML=todayEvs.slice(0,4).map(e=>'<div class="ev-item" style="border-color:'+(CAT_COL[e.category]||'var(--acc2)')+'">'+
+      '<div class="ev-time">'+(e.time||'Todo el día')+(e.endTime?' — '+e.endTime:'')+'</div>'+
+      '<div class="ev-title">'+e.title+'</div>'+
+      (e.notes?'<div style="font-size:11px;color:var(--soft);margin-top:3px">'+e.notes.slice(0,60)+'</div>':'')+
+      '</div>').join('');
+  }
+  // Priority tasks
+  var urgTasks=S.tasks.filter(t=>t.status!=='done').sort((a,b)=>{
+    var po={urgent:0,high:1,normal:2,low:3};
+    return (po[a.priority]||2)-(po[b.priority]||2);
+  }).slice(0,3);
+  var dTk=ge('dTasks');
+  if(dTk){
+    if(!urgTasks.length)dTk.innerHTML='<div style="font-size:12px;color:var(--mut);padding:8px 0">¡Sin tareas pendientes! 🎉</div>';
+    else dTk.innerHTML=urgTasks.map(t=>'<div class="lr" onclick="openTask(\''+t.id+'\')" style="cursor:pointer">'+
+      '<div class="lrico" style="background:rgba(124,58,237,.12)">'+( CAT_EMOJI[t.category]||'✅')+'</div>'+
+      '<div class="lrbody"><div class="lrname">'+t.title+'</div>'+
+      '<div class="lrsub"><span class="pri p-'+t.priority+'">'+PRI_LABEL[t.priority]+'</span>'+(t.dueDate?' · '+fmtDateShort(t.dueDate):'')+'</div></div>'+
+      '<button class="btn bg2 bsm" onclick="event.stopPropagation();quickDoneTask(\''+t.id+'\')">✓</button>'+
+      '</div>').join('');
+  }
+  // Habits today
+  var dH=ge('dHabits');
+  if(dH){
+    if(!S.habits.length)dH.innerHTML='<div style="font-size:12px;color:var(--mut);padding:8px 0">Sin hábitos. <span style="color:var(--acc2);cursor:pointer" onclick="openHabit(null)">+ Crear hábito</span></div>';
+    else dH.innerHTML='<div class="card" style="padding:10px">'+S.habits.map(h2=>{
+      var done=S.habitLog[todayStr()]&&S.habitLog[todayStr()][h2.id];
+      return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--c3)" onclick="toggleHabit(\''+h2.id+'\')">'+
+        '<div style="width:28px;height:28px;border-radius:8px;background:'+(done?h2.color||'var(--gr)':'var(--c3)')+';display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:.2s">'+(done?'✓':h2.emoji||'💪')+'</div>'+
+        '<div style="flex:1;font-size:13px;font-weight:600;'+(done?'text-decoration:line-through;opacity:.5':'')+'">'+h2.name+'</div>'+
+        '<div style="font-size:11px;color:var(--soft)">'+getHabitStreak(h2.id)+'🔥</div>'+
+        '</div>';
+    }).join('')+'</div>';
+  }
+  // Active goals
+  var dG=ge('dGoals');
+  if(dG){
+    var ag=S.goals.filter(g=>g.status==='active').slice(0,3);
+    if(!ag.length)dG.innerHTML='<div style="font-size:12px;color:var(--mut);padding:8px 0">Sin objetivos activos. <span style="color:var(--acc2);cursor:pointer" onclick="openGoal(null)">+ Crear objetivo</span></div>';
+    else dG.innerHTML=ag.map(g=>{
+      var pct=goalPct(g);
+      var du=g.targetDate?daysUntil(g.targetDate):null;
+      return '<div class="goal-card" onclick="showGoalDetail(\''+g.id+'\')">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
+          '<span style="font-size:13px;font-weight:700">'+CAT_EMOJI[g.category]+' '+g.title+'</span>'+
+          '<span style="font-size:12px;font-weight:700;color:'+(pct>=80?'var(--gr)':pct>=40?'var(--yw)':'var(--acc2)')+'">'+pct+'%</span>'+
+        '</div>'+
+        '<div class="pbar"><div class="pbar-fill" style="width:'+pct+'%;background:'+(pct>=80?'var(--gr)':pct>=40?'var(--yw)':'var(--acc2)')+'"></div></div>'+
+        (du!==null?'<div style="font-size:11px;color:'+(du<0?'var(--rd)':du<=7?'var(--yw)':'var(--soft)')+'">'+
+          (du<0?'⏰ Venció hace '+Math.abs(du)+' días':du===0?'⚡ Vence hoy':du<=7?'⚠️ '+du+' días restantes':'📅 '+du+' días restantes')+
+        '</div>':'')+'</div>';
+    }).join('');
+  }
+}
+
+// ─── AGENDA ────────────────────────────────────────────────────
+function getEventsForDate(dateStr){
+  var result=[];
+  S.events.forEach(function(e){
+    if(e.date===dateStr){result.push(e);return;}
+    if(e.recurring==='daily'&&e.date<=dateStr)result.push(Object.assign({},e,{date:dateStr}));
+    if(e.recurring==='weekly'){var orig=new Date(e.date+'T12:00:00'),cur=new Date(dateStr+'T12:00:00');if(orig.getDay()===cur.getDay()&&e.date<=dateStr)result.push(Object.assign({},e,{date:dateStr}));}
+    if(e.recurring==='monthly'){var op=e.date.split('-'),dp=dateStr.split('-');if(op[2]===dp[2]&&e.date<=dateStr)result.push(Object.assign({},e,{date:dateStr}));}
+  });
+  return result.sort((a,b)=>(a.time||'00:00').localeCompare(b.time||'00:00'));
+}
+function renderAgenda(){
+  var lbl=ge('calMonthLbl');if(lbl)lbl.textContent=(['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][S.calM]+' '+S.calY);
+  var grid=ge('calGrid');if(!grid)return;
+  var firstDay=new Date(S.calY,S.calM,1).getDay();
+  var daysIn=new Date(S.calY,S.calM+1,0).getDate();
+  var prevDays=new Date(S.calY,S.calM,0).getDate();
+  var html2='';var today2=todayStr();
+  // Prev month filler
+  for(var i=firstDay-1;i>=0;i--){
+    var d=prevDays-i;
+    html2+='<div class="cal-day other-month"><div class="cal-day-num">'+d+'</div></div>';
+  }
+  for(var d2=1;d2<=daysIn;d2++){
+    var ds=(S.calY+'-'+(S.calM+1<10?'0':'')+(S.calM+1)+'-'+(d2<10?'0':'')+d2);
+    var evs=getEventsForDate(ds);
+    var cls='cal-day'+(ds===today2?' today':'')+(ds===S.selDate?' selected':'');
+    var dots=evs.slice(0,3).map(e=>'<div class="ev-pill" style="background:'+(CAT_COL[e.category]||'var(--acc3)')+'80;color:var(--txt)">'+e.title+'</div>').join('');
+    html2+='<div class="'+cls+'" onclick="selDay(\''+ds+'\')">'+
+      '<div class="cal-day-num">'+d2+'</div>'+
+      '<div class="cal-dots">'+dots+'</div>'+
+      '</div>';
+  }
+  // Fill rest
+  var total=firstDay+daysIn;var rem=(7-total%7)%7;
+  for(var x=1;x<=rem;x++)html2+='<div class="cal-day other-month"><div class="cal-day-num">'+x+'</div></div>';
+  grid.innerHTML=html2;
+  renderDayEvents();
+}
+function calNav(dir){
+  S.calM+=dir;
+  if(S.calM>11){S.calM=0;S.calY++;}
+  if(S.calM<0){S.calM=11;S.calY--;}
+  renderAgenda();
+}
+function selDay(d){S.selDate=d;renderAgenda();}
+function renderDayEvents(){
+  var lbl=ge('selDateLbl');if(lbl)lbl.textContent='📅 '+fmtDate(S.selDate);
+  var el=ge('calDayEvents');if(!el)return;
+  var evs=getEventsForDate(S.selDate);
+  if(!evs.length){el.innerHTML='<div style="font-size:12px;color:var(--mut);padding:8px 0">Sin eventos. <span style="color:var(--acc2);cursor:pointer" onclick="openEvent(null,\''+S.selDate+'\')">+ Agregar</span></div>';return;}
+  el.innerHTML=evs.map(e=>'<div class="ev-item" style="border-color:'+(CAT_COL[e.category]||'var(--acc2)')+'">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+      '<div>'+
+        '<div class="ev-time">'+(e.time||'Todo el día')+(e.endTime?' – '+e.endTime:'')+(e.recurring!=='none'?' 🔄':'')+'</div>'+
+        '<div class="ev-title">'+e.title+'</div>'+
+        (e.notes?'<div style="font-size:11px;color:var(--soft);margin-top:3px">'+e.notes+'</div>':'')+
+      '</div>'+
+      '<button class="btn bs bsm" onclick="openEvent(\''+e.id+'\')">✏️</button>'+
+    '</div>'+
+    '</div>').join('');
+}
+
+// ─── EVENTS CRUD ──────────────────────────────────────────────
+function openEvent(id,dateDefault){
+  var evCs=ge('evCat');if(evCs)evCs.innerHTML=areaOptions('');
+  var e=id?S.events.find(x=>x.id===id):null;
+  setV('evId',id||'');setV('evTitle',e?e.title:'');setV('evDate',e?e.date:(dateDefault||todayStr()));
+  setV('evTime',e?e.time||'':'');setV('evEndTime',e?e.endTime||'':'');
+  setV('evNotes',e?e.notes||'':'');
+  var cs=ge('evCat');if(cs&&e)cs.value=e.category||'personal';
+  var rs=ge('evRecurring');if(rs&&e)rs.value=e.recurring||'none';else if(rs)rs.value='none';
+  var db=ge('evDelBtn');if(db)db.style.display=id?'flex':'none';
+  showM('mEvent');
+}
+function saveEvent(){
+  var title=getV('evTitle').trim();if(!title)return toast('Agrega un título','#f43f5e');
+  var id=getV('evId');
+  var ev={id:id||uid(),title:title,date:getV('evDate'),time:getV('evTime'),endTime:getV('evEndTime'),
+    category:getV('evCat'),notes:getV('evNotes'),recurring:getV('evRecurring')};
+  if(id)S.events=S.events.map(e=>e.id===id?ev:e);else S.events.push(ev);
+  persist();hideM('mEvent');renderAgenda();renderDash();toast('Evento guardado ✓');
+}
+function delEvent(){var id=getV('evId');S.events=S.events.filter(e=>e.id!==id);persist();hideM('mEvent');renderAgenda();renderDash();toast('Eliminado','#f97316');}
+
+// ─── TASKS ────────────────────────────────────────────────────
+function renderTareas(){
+  var tf=ge('taskFilters');
+  if(tf)tf.innerHTML=['all','personal','negocio','financiero','salud','familia','aprendizaje'].map(f=>'<div class="chip '+(S.taskFilter===f?'on':'')+'" onclick="setTaskFilter(\''+f+'\')">'+(f==='all'?'Todas':(CAT_EMOJI[f]||'')+' '+f.charAt(0).toUpperCase()+f.slice(1))+'</div>').join('');
+  var filtered=S.tasks.filter(t=>S.taskFilter==='all'||t.category===S.taskFilter);
+  var cols={pending:filtered.filter(t=>t.status==='pending'),progress:filtered.filter(t=>t.status==='progress'),done:filtered.filter(t=>t.status==='done').slice(-10)};
+  var kEl=ge('kanban');if(!kEl)return;
+  kEl.innerHTML=[
+    {k:'pending',label:'⏳ Pendiente',col:'rgba(251,191,36,.15)',tc:'#fbbf24'},
+    {k:'progress',label:'🔄 En progreso',col:'rgba(59,130,246,.15)',tc:'#3b82f6'},
+    {k:'done',label:'✅ Completada',col:'rgba(16,185,129,.15)',tc:'#10b981'}
+  ].map(col=>'<div class="kcolumn"><div class="kcol-title" style="background:'+col.col+';color:'+col.tc+'">'+col.label+' ('+cols[col.k].length+')</div>'+
+    (cols[col.k].length?cols[col.k].map(t=>renderTaskCard(t)).join(''):'<div style="font-size:11px;color:var(--mut);padding:8px;text-align:center">Sin tareas</div>')+
+    '</div>').join('');
+}
+function renderTaskCard(t){
+  var due=t.dueDate?daysUntil(t.dueDate):null;
+  var dueCol=due!==null?(due<0?'var(--rd)':due<=2?'var(--yw)':'var(--soft)'):'var(--soft)';
+  return '<div class="ktask" onclick="openTask(\''+t.id+'\')">'+
+    '<div class="ktask-title">'+t.title+'</div>'+
+    '<div class="ktask-meta">'+
+      '<span class="pri p-'+t.priority+'">'+PRI_LABEL[t.priority]+'</span>'+
+      (t.category?'<span style="font-size:11px;color:var(--soft)">'+CAT_EMOJI[t.category]+'</span>':'')+
+      (t.dueDate?'<span style="font-size:10px;color:'+dueCol+'">📅 '+fmtDateShort(t.dueDate)+'</span>':'')+
+    '</div>'+
+    (t.status!=='done'?'<button class="btn bg2 bsm" style="width:100%;margin-top:8px" onclick="event.stopPropagation();quickDoneTask(\''+t.id+'\')">✓ Marcar completa</button>':'')+
+    '</div>';
+}
+function clearDoneTasks(){
+  if(!confirm('¿Eliminar todas las tareas completadas?'))return;
+  S.tasks=S.tasks.filter(t=>t.status!=='done');
+  persist();renderTareas();toast('Completadas eliminadas','#f97316');
+}
+function setTaskFilter(f){S.taskFilter=f;renderTareas();}
+function openTask(id){
+  var tkCs=ge('tkCat');if(tkCs)tkCs.innerHTML=areaOptions('');
+  var t=id?S.tasks.find(x=>x.id===id):null;
+  setV('tkId',id||'');setV('tkTitle',t?t.title:'');setV('tkDesc',t?t.description||'':'');
+  setV('tkDue',t?t.dueDate||'':'');
+  var ps=ge('tkPri');if(ps)ps.value=t?t.priority:'normal';
+  var cs=ge('tkCat');if(cs)cs.value=t?t.category:'personal';
+  var ss=ge('tkStatus');if(ss)ss.value=t?t.status:'pending';
+  var db=ge('tkDelBtn');if(db)db.style.display=id?'flex':'none';
+  showM('mTask');
+}
+function saveTask(){
+  var title=getV('tkTitle').trim();if(!title)return toast('Agrega un título','#f43f5e');
+  var id=getV('tkId');var existing=id?S.tasks.find(x=>x.id===id):null;
+  var status=getV('tkStatus');
+  var tk={id:id||uid(),title:title,description:getV('tkDesc'),priority:getV('tkPri'),
+    dueDate:getV('tkDue'),category:getV('tkCat'),status:status,
+    createdAt:existing?existing.createdAt:todayStr(),
+    completedAt:status==='done'?(existing&&existing.completedAt||todayStr()):null};
+  if(id)S.tasks=S.tasks.map(t=>t.id===id?tk:t);else S.tasks.push(tk);
+  persist();hideM('mTask');renderTareas();renderDash();toast('Tarea guardada ✓');
+}
+function delTask(){var id=getV('tkId');S.tasks=S.tasks.filter(t=>t.id!==id);persist();hideM('mTask');renderTareas();renderDash();toast('Eliminada','#f97316');}
+function quickDoneTask(id){
+  S.tasks=S.tasks.map(t=>t.id===id?Object.assign({},t,{status:'done',completedAt:todayStr()}):t);
+  persist();renderDash();renderTareas();toast('✅ Tarea completada!','#10b981');
+}
+
+// ─── GOALS ────────────────────────────────────────────────────
+function goalPct(g){
+  if(!g.steps||!g.steps.length)return 0;
+  return Math.round(g.steps.filter(s=>s.done).length/g.steps.length*100);
+}
+function renderMetas(){
+  var gf=ge('goalFilters');
+  if(gf)gf.innerHTML=['all','active','completed','paused'].map(f=>'<div class="chip '+(S.goalFilter===f?'on':'')+'" onclick="setGoalFilter(\''+f+'\')">'+(f==='all'?'Todas':f==='active'?'🔥 Activas':f==='completed'?'✅ Logradas':'⏸ Pausadas')+'</div>').join('');
+  var filtered=S.goals.filter(g=>S.goalFilter==='all'||g.status===S.goalFilter);
+  if(S.selGoal){renderGoalDetail();return;}
+  var gl=ge('goalList');if(!gl)return;
+  ge('goalDetail').style.display='none';gl.style.display='block';
+  var gh2=ge('goalHint');if(gh2)gh2.style.display=filtered.length?'block':'none';
+  if(!filtered.length){gl.innerHTML='<div class="empty"><div class="ei">🎯</div><div class="et">Sin objetivos aún</div><button class="btn bp" onclick="openGoal(null)">+ Crear primer objetivo</button></div>';return;}
+  gl.innerHTML=filtered.map(g=>{
+    var pct=goalPct(g);var du=g.targetDate?daysUntil(g.targetDate):null;
+    return '<div class="goal-card '+(g.status==='active'?'active':'')+'" onclick="showGoalDetail(\''+g.id+'\')">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'+
+        '<div>'+
+          '<div style="font-size:14px;font-weight:700;margin-bottom:3px">'+CAT_EMOJI[g.category]+' '+g.title+'</div>'+
+          '<div style="font-size:11px;color:var(--soft)">'+(['financiero','personal','negocio','salud','familia','aprendizaje'].includes(g.category)?g.category:'')+
+          (g.targetDate?' · '+fmtDateShort(g.targetDate):'')+
+          (du!==null?' · <span style="color:'+(du<0?'var(--rd)':du<=7?'var(--yw)':'var(--soft)')+'">'+
+            (du<0?'Venció hace '+Math.abs(du)+'d':du===0?'Hoy!':du+'d restantes')+'</span>':'')+
+          '</div>'+
+        '</div>'+
+        '<span style="font-size:18px;font-weight:800;color:'+(pct>=80?'var(--gr)':pct>=40?'var(--yw)':'var(--acc2)')+'">'+pct+'%</span>'+
+      '</div>'+
+      '<div class="pbar"><div class="pbar-fill" style="width:'+pct+'%;background:'+(pct>=80?'var(--gr)':pct>=40?'var(--yw)':'var(--acc2)')+'"></div></div>'+
+      '<div style="font-size:11px;color:var(--soft);margin-top:4px">'+g.steps.filter(s=>s.done).length+'/'+g.steps.length+' pasos completados</div>'+
+      '</div>';
+  }).join('');
+}
+function setGoalFilter(f){
+  S.goalFilter=f;
+  S.selGoal=null;
+  var gd=ge('goalDetail');if(gd)gd.style.display='none';
+  var gl=ge('goalList');if(gl)gl.style.display='block';
+  renderMetas();
+}
+function showGoalDetail(id){S.selGoal=id;renderMetas();}
+function renderGoalDetail(){
+  var g=S.goals.find(x=>x.id===S.selGoal);if(!g)return;
+  var gl=ge('goalList'),gd=ge('goalDetail');
+  if(gl)gl.style.display='none';if(gd)gd.style.display='block';
+  var pct=goalPct(g);var du=g.targetDate?daysUntil(g.targetDate):null;
+  gd.innerHTML=
+    '<button class="btn bs bsm" style="margin-bottom:12px" onclick="S.selGoal=null;renderMetas()">← Volver</button>'+
+    '<div class="card">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">'+
+        '<div>'+
+          '<div style="font-size:16px;font-weight:800;margin-bottom:4px">'+CAT_EMOJI[g.category]+' '+g.title+'</div>'+
+          (g.description?'<div style="font-size:13px;color:var(--soft);margin-bottom:6px">'+g.description+'</div>':'')+
+          '<div style="font-size:11px;color:var(--soft)">'+g.category+(g.targetDate?' · Límite: '+fmtDate(g.targetDate):'')+'</div>'+
+        '</div>'+
+        '<button class="btn bs bsm" onclick="openGoal(\''+g.id+'\')">✏️</button>'+
+      '</div>'+
+      '<div class="g4" style="margin-bottom:12px">'+
+        '<div class="sc"><div class="sl">Progreso</div><div class="sv" style="color:'+(pct>=80?'var(--gr)':pct>=40?'var(--yw)':'var(--acc2)')+'">'+pct+'%</div></div>'+
+        '<div class="sc"><div class="sl">Pasos</div><div class="sv cv">'+g.steps.filter(s=>s.done).length+'/'+g.steps.length+'</div></div>'+
+        '<div class="sc"><div class="sl">Estado</div><div class="sv">'+(g.status==='active'?'🔥':g.status==='completed'?'✅':'⏸')+'</div></div>'+
+        '<div class="sc"><div class="sl">Días restantes</div><div class="sv '+(du!==null&&du<0?'cr':du!==null&&du<=7?'cy':'cg')+'">'+(du!==null?Math.abs(du)+'d':'—')+'</div></div>'+
+      '</div>'+
+      '<div class="pbar" style="height:12px"><div class="pbar-fill" style="width:'+pct+'%;background:'+(pct>=80?'var(--gr)':pct>=40?'var(--yw)':'var(--acc2)')+'"></div></div>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px">'+
+      '<div class="st">📌 Pasos / Hitos</div>'+
+      '<button class="btn bp bsm" onclick="openStep(\''+g.id+'\')">+ Paso</button>'+
+    '</div>'+
+    (g.steps.length?g.steps.map(s=>'<div class="step-item">'+
+      '<div class="step-cb '+(s.done?'done':'')+'" onclick="toggleStep(\''+g.id+'\',\''+s.id+'\')">'+
+        (s.done?'<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>':'')+
+      '</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:13px;'+(s.done?'text-decoration:line-through;opacity:.5':'')+' ">'+s.text+'</div>'+
+        (s.dueDate?'<div style="font-size:10px;color:var(--soft)">📅 '+fmtDateShort(s.dueDate)+'</div>':'')+
+      '</div>'+
+      '<button class="btn bs bsm" onclick="delStep(\''+g.id+'\',\''+s.id+'\')">✕</button>'+
+      '</div>').join(''):'<div style="font-size:12px;color:var(--mut);padding:8px 0">Sin pasos. Agrega hitos para trackear el avance.</div>')+
+    '<div class="sh" style="margin-top:10px"><div class="st">📝 Notas y avances</div><button class="btn bp bsm" onclick="openGoalNote(\''+g.id+'\')">+ Nota</button></div>'+
+    (g.notes&&g.notes.length?g.notes.slice().reverse().map(n=>'<div class="lr" style="align-items:flex-start">'+
+      '<div class="lrico" style="background:rgba(124,58,237,.1)">📝</div>'+
+      '<div class="lrbody"><div class="lrname" style="font-size:12px;white-space:normal">'+n.text+'</div><div class="lrsub">'+fmtDateShort(n.date)+'</div></div>'+
+      '<div class="lracts"><button class="btn br bxs" data-gid="'+g.id+'" data-nid="'+n.id+'" onclick="delGoalNote(this.dataset.gid,this.dataset.nid)">🗑️</button></div>'+
+      '</div>').join(''):'<div style="font-size:12px;color:var(--mut);padding:8px 0">Sin notas aún.</div>')+
+    '<div style="margin-top:12px">'+
+    '<button class="btn '+(g.status==='active'?'by':'bp')+' bfu" onclick="toggleGoalStatus(\''+g.id+'\')">'+
+      (g.status==='active'?'⏸ Pausar':'🔥 Activar')+
+    '</button>'+
+    '<button class="btn bg2 bfu" style="margin-top:6px" onclick="completeGoal(\''+g.id+'\')">✅ Marcar como logrado</button>'+
+    '</div>';
+}
+
+function openGoal(id){
+  var glCs=ge('glCat');if(glCs)glCs.innerHTML=areaOptions('');
+  var g=id?S.goals.find(x=>x.id===id):null;
+  setV('glId',id||'');setV('glTitle',g?g.title:'');setV('glDesc',g?g.description||'':'');
+  setV('glDate',g?g.targetDate||'':'');
+  var cs=ge('glCat');if(cs)cs.value=g?g.category:'financiero';
+  var is=ge('glImp');if(is)is.value=g?g.importance:'medium';
+  var db=ge('glDelBtn');if(db)db.style.display=id?'flex':'none';
+  showM('mGoal');
+}
+function saveGoal(){
+  var title=getV('glTitle').trim();if(!title)return toast('Agrega un título','#f43f5e');
+  var id=getV('glId');var existing=id?S.goals.find(x=>x.id===id):null;
+  var gl={id:id||uid(),title:title,description:getV('glDesc'),category:getV('glCat'),
+    targetDate:getV('glDate'),importance:getV('glImp'),status:existing?existing.status:'active',
+    steps:existing?existing.steps:[],notes:existing?existing.notes:[],createdAt:existing?existing.createdAt:todayStr()};
+  if(id)S.goals=S.goals.map(g=>g.id===id?gl:g);else S.goals.push(gl);
+  persist();hideM('mGoal');renderMetas();renderDash();toast('Objetivo guardado ✓');
+}
+function delGoal(){var id=getV('glId');S.goals=S.goals.filter(g=>g.id!==id);S.selGoal=null;persist();hideM('mGoal');renderMetas();renderDash();}
+function toggleGoalStatus(id){
+  S.goals=S.goals.map(g=>g.id===id?Object.assign({},g,{status:g.status==='active'?'paused':'active'}):g);
+  persist();renderMetas();renderDash();
+}
+function completeGoal(id){
+  S.goals=S.goals.map(g=>g.id===id?Object.assign({},g,{status:'completed'}):g);
+  persist();S.selGoal=null;renderMetas();renderDash();toast('🎉 ¡Objetivo logrado!','#10b981');
+}
+function openStep(goalId){setV('stepGoalId',goalId);setV('stepText','');setV('stepDue','');showM('mStep');}
+function saveStep(){
+  var text=getV('stepText').trim();if(!text)return toast('Describe el paso','#f43f5e');
+  var gid=getV('stepGoalId');
+  S.goals=S.goals.map(g=>{if(g.id!==gid)return g;var st=[...g.steps,{id:uid(),text:text,dueDate:getV('stepDue'),done:false}];return Object.assign({},g,{steps:st});});
+  persist();hideM('mStep');renderMetas();toast('Paso agregado ✓');
+}
+function delStep(gid,sid){S.goals=S.goals.map(g=>g.id!==gid?g:Object.assign({},g,{steps:g.steps.filter(s=>s.id!==sid)}));persist();renderMetas();}
+function toggleStep(gid,sid){
+  S.goals=S.goals.map(g=>g.id!==gid?g:Object.assign({},g,{steps:g.steps.map(s=>s.id!==sid?s:Object.assign({},s,{done:!s.done}))}));
+  persist();renderMetas();renderDash();
+}
+function openGoalNote(goalId){setV('noteGoalId',goalId);setV('noteText','');showM('mNote');}
+function delGoalNote(gid,nid){
+  if(!confirm('¿Eliminar esta nota?'))return;
+  S.goals=S.goals.map(g=>g.id!==gid?g:Object.assign({},g,{notes:(g.notes||[]).filter(n=>n.id!==nid)}));
+  persist();renderMetas();toast('Nota eliminada','#f97316');
+}
+function saveGoalNote(){
+  var text=getV('noteText').trim();if(!text)return toast('Escribe una nota','#f43f5e');
+  var gid=getV('noteGoalId');
+  S.goals=S.goals.map(g=>{if(g.id!==gid)return g;var ns=[...(g.notes||[]),{id:uid(),date:todayStr(),text:text}];return Object.assign({},g,{notes:ns});});
+  persist();hideM('mNote');renderMetas();toast('Nota guardada ✓');
+}
+
+// ─── HABITS ────────────────────────────────────────────────────
+function toggleHabit(id){
+  var d=todayStr();
+  if(!S.habitLog[d])S.habitLog[d]={};
+  S.habitLog[d][id]=!S.habitLog[d][id];
+  persist();
+  // Refresh only the relevant sections to avoid lag
+  var dH=ge('dHabits');
+  if(dH) {
+    // Re-render just the habits section in dashboard
+    var doneH=S.habits.filter(function(h2){return S.habitLog[d]&&S.habitLog[d][h2.id];}).length;
+    S.habits.forEach(function(h2){
+      var done=S.habitLog[d]&&S.habitLog[d][h2.id];
+      var ico=document.querySelector('[data-habid="'+h2.id+'"]');
+      if(ico){ico.style.background=done?h2.color||'var(--gr)':'var(--c3)';ico.textContent=done?'✓':h2.emoji||'💪';}
+      var row=document.querySelector('[data-habtxt="'+h2.id+'"]');
+      if(row){row.style.textDecoration=done?'line-through':'none';row.style.opacity=done?'0.5':'1';}
+    });
+  }
+  if(ge('pg-h').classList.contains('on')) renderHabitos();
+  // Update streak display in dashboard
+  renderDash();
+}
+function getHabitStreak(id){
+  var d=new Date(),streak=0;
+  for(var i=0;i<365;i++){
+    var ds=d.toISOString().slice(0,10);
+    if(S.habitLog[ds]&&S.habitLog[ds][id])streak++;
+    else if(i>0)break;
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+function getStreakAll(){
+  var d=new Date(),streak=0;
+  for(var i=0;i<365;i++){
+    var ds=d.toISOString().slice(0,10);
+    var allDone=S.habits.length>0&&S.habits.every(h=>S.habitLog[ds]&&S.habitLog[ds][h.id]);
+    if(allDone)streak++;else if(i>0)break;
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+function renderHabitos(){
+  var td=ge('habTodayDate');if(td)td.textContent=fmtDate(todayStr());
+  // Today section
+  var ht=ge('habToday');
+  if(ht){
+    if(!S.habits.length)ht.innerHTML='<div class="empty"><div class="ei">💪</div><div class="et">Sin hábitos aún</div><button class="btn bp" onclick="openHabit(null)">+ Crear primer hábito</button></div>';
+    else ht.innerHTML='<div class="card" style="padding:6px">'+S.habits.map(h=>{
+      var done=S.habitLog[todayStr()]&&S.habitLog[todayStr()][h.id];
+      var streak=getHabitStreak(h.id);
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;margin-bottom:4px;background:'+(done?'rgba(16,185,129,.08)':'var(--c2)')+'">'+
+        '<div style="width:44px;height:44px;border-radius:12px;background:'+(done?h.color||'var(--gr)':'var(--c3)')+
+        ';display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;flex-shrink:0;transition:.2s" onclick="toggleHabit(\''+h.id+'\')">'+(done?'✓':h.emoji||'💪')+'</div>'+
+        '<div style="flex:1">'+
+          '<div style="font-size:14px;font-weight:700;'+(done?'text-decoration:line-through;opacity:.6':'')+' ">'+h.name+'</div>'+
+          '<div style="display:flex;align-items:center;gap:8px;margin-top:3px">'+
+            '<span class="streak-badge">🔥 '+streak+'</span>'+
+            '<span style="font-size:10px;color:var(--soft)">'+h.category+'</span>'+
+          '</div>'+
+        '</div>'+
+        '<button class="btn bs bsm" onclick="openHabit(\''+h.id+'\')" style="padding:4px 8px">✏️</button>'+
+        '</div>';
+    }).join('')+'</div>';
+  }
+  // Tracking grid — last 8 weeks per habit
+  var htr=ge('habTrack');
+  if(htr){
+    htr.innerHTML=S.habits.map(h=>{
+      var rows='';
+      var now=new Date();
+      for(var w=7;w>=0;w--){
+        var cells='';
+        for(var d=0;d<7;d++){
+          var dt=new Date(now);dt.setDate(now.getDate()-(w*7+d));
+          var ds=dt.toISOString().slice(0,10);
+          var done=S.habitLog[ds]&&S.habitLog[ds][h.id];
+          var isToday=ds===todayStr();
+          cells+='<div class="hm-cell '+(done?'lv4':'')+(isToday?' today-dot':'')+'" style="'+(done?'background:'+h.color||'var(--acc2)':'')+'"></div>';
+        }
+        rows+=cells;
+      }
+      var rate=calcHabitRate(h.id,30);
+      return '<div class="card" style="padding:10px;margin-bottom:8px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+          '<div style="font-size:13px;font-weight:700">'+h.emoji+' '+h.name+'</div>'+
+          '<div style="font-size:12px;font-weight:700;color:'+(rate>=80?'var(--gr)':rate>=50?'var(--yw)':'var(--rd)')+'">'+rate+'% 30d</div>'+
+        '</div>'+
+        '<div style="display:grid;grid-template-columns:repeat(56,1fr);gap:2px">'+rows+'</div>'+
+        '</div>';
+    }).join('')||'';
+  }
+  // Habit chart
+  dc('habChart');var hc=ge('habChart');
+  if(hc&&S.habits.length&&typeof Chart!=='undefined'){
+    var labels=S.habits.map(h=>h.emoji+' '+h.name.slice(0,12));
+    var data=S.habits.map(h=>calcHabitRate(h.id,30));
+    _charts['habChart']=new Chart(hc.getContext('2d'),{type:'bar',data:{labels,datasets:[{data,backgroundColor:S.habits.map(h=>(h.color||'#7c3aed')+'80'),borderColor:S.habits.map(h=>h.color||'#7c3aed'),borderWidth:2,borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8fa3b1',font:{size:9}},grid:{display:false}},y:{min:0,max:100,ticks:{color:'#8fa3b1',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  }
+}
+function calcHabitRate(id,days){
+  var count=0;var n=new Date();
+  for(var i=0;i<days;i++){var ds=new Date(n);ds.setDate(n.getDate()-i);var d=ds.toISOString().slice(0,10);if(S.habitLog[d]&&S.habitLog[d][id])count++;}
+  return Math.round(count/days*100);
+}
+function openHabit(id){
+  var hbCs=ge('hbCat');if(hbCs)hbCs.innerHTML=areaOptions('');
+  var h=id?S.habits.find(x=>x.id===id):null;
+  setV('hbId',id||'');setV('hbName',h?h.name:'');setV('hbEmo',h?h.emoji||'':'💪');
+  var cs=ge('hbCat');if(cs)cs.value=h?h.category:'salud';
+  var c=h?h.color:'#10b981';setV('hbColor',c);S.selHabColor=c;
+  document.querySelectorAll('#hbColorPicker div').forEach(d=>{d.style.border=d.dataset.color===c?'3px solid white':'2px solid transparent';});
+  var db=ge('hbDelBtn');if(db)db.style.display=id?'flex':'none';
+  showM('mHabit');
+}
+function selHabColor(c){
+  setV('hbColor',c);S.selHabColor=c;
+  document.querySelectorAll('#hbColorPicker div').forEach(d=>{d.style.border=d.dataset.color===c?'3px solid white':'2px solid transparent';});
+}
+function saveHabit(){
+  var name=getV('hbName').trim();if(!name)return toast('Agrega un nombre','#f43f5e');
+  var id=getV('hbId');
+  var h={id:id||uid(),name:name,emoji:getV('hbEmo')||'💪',category:getV('hbCat'),color:getV('hbColor')||'#10b981',createdAt:id?(S.habits.find(x=>x.id===id)||{}).createdAt||todayStr():todayStr()};
+  if(id)S.habits=S.habits.map(x=>x.id===id?h:x);else S.habits.push(h);
+  persist();hideM('mHabit');renderHabitos();renderDash();toast('Hábito guardado ✓');
+}
+function delHabit(){var id=getV('hbId');S.habits=S.habits.filter(h=>h.id!==id);persist();hideM('mHabit');renderHabitos();renderDash();}
+
+// ─── JOURNAL ───────────────────────────────────────────────────
+function selMood(m){
+  setV('jMood',m||'😊');
+  document.querySelectorAll('.mood-btn').forEach(function(b){
+    b.classList.toggle('sel', b.getAttribute('data-mood')===m);
+  });
+}
+function openJournal(id){
+  var j=id?S.journal.find(x=>x.id===id):null;
+  setV('jId',id||'');setV('jDate',j?j.date:todayStr());setV('jText',j?j.text||'':'');setV('jGood',j?j.good||'':'');
+  selMood(j?j.mood||'😊':'😊');
+  var db=ge('jDelBtn');if(db)db.style.display=id?'flex':'none';
+  showM('mJournal');
+}
+function saveJournal(){
+  var date=getV('jDate');if(!date)return toast('Selecciona fecha','#f43f5e');
+  var id=getV('jId');
+  var j={id:id||uid(),date:date,mood:getV('jMood'),text:getV('jText'),good:getV('jGood')};
+  if(id)S.journal=S.journal.map(x=>x.id===id?j:x);else S.journal.push(j);
+  persist();hideM('mJournal');renderJournal();toast('Entrada guardada ✓');
+}
+function delJournal(){var id=getV('jId');S.journal=S.journal.filter(x=>x.id!==id);persist();hideM('mJournal');renderJournal();}
+function renderJournal(){
+  var el=ge('journalList');if(!el)return;
+  var sorted=S.journal.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  if(!sorted.length){el.innerHTML='<div class="empty"><div class="ei">📓</div><div class="et">Tu diario está vacío</div><button class="btn bp" onclick="openJournal(null)">+ Primera entrada</button></div>';return;}
+  el.innerHTML=sorted.map(j=>'<div class="card" style="cursor:pointer;margin-bottom:10px" onclick="openJournal(\''+j.id+'\')">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+      '<span style="font-size:13px;font-weight:700">'+fmtDate(j.date)+'</span>'+
+      '<span style="font-size:22px">'+j.mood+'</span>'+
+    '</div>'+
+    (j.text?'<p style="font-size:13px;color:var(--soft);line-height:1.5;margin-bottom:6px">'+j.text.slice(0,150)+(j.text.length>150?'...':'')+'</p>':'')+
+    (j.good?'<p style="font-size:11px;color:var(--soft);font-style:italic">'+j.good.slice(0,80)+'</p>':'')+
+    '</div>').join('');
+}
+
+// ─── ANALYTICS ────────────────────────────────────────────────
+function renderAna(){
+  // Stats
+  var totTasks=S.tasks.length;
+  var doneTasks=S.tasks.filter(t=>t.status==='done').length;
+  var rate=totTasks?Math.round(doneTasks/totTasks*100):0;
+  var totGoals=S.goals.length;
+  var doneGoals=S.goals.filter(g=>g.status==='completed').length;
+  var avgHab=S.habits.length?Math.round(S.habits.reduce((s,h)=>s+calcHabitRate(h.id,30),0)/S.habits.length):0;
+  var as2=ge('anaStats');
+  if(as2)as2.innerHTML=
+    '<div class="sc"><div class="sl">Tareas completadas</div><div class="sv cg">'+doneTasks+'/'+totTasks+'</div></div>'+
+    '<div class="sc"><div class="sl">Tasa de completar</div><div class="sv cy">'+rate+'%</div></div>'+
+    '<div class="sc"><div class="sl">Metas logradas</div><div class="sv cv">'+doneGoals+'/'+totGoals+'</div></div>'+
+    '<div class="sc"><div class="sl">Adherencia hábitos</div><div class="sv '+(avgHab>=80?'cg':avgHab>=50?'cy':'cr')+'">'+avgHab+'%</div></div>';
+  if(typeof Chart==='undefined')return;
+  // Task completion last 30 days
+  dc('taskChart');var tc=ge('taskChart');
+  if(tc){
+    var labels=[],data=[];
+    for(var i=29;i>=0;i--){
+      var d=new Date();d.setDate(d.getDate()-i);var ds=d.toISOString().slice(0,10);
+      labels.push(i%5===0?fmtDateShort(ds):'');
+      data.push(S.tasks.filter(t=>t.completedAt===ds).length);
+    }
+    _charts['taskChart']=new Chart(tc.getContext('2d'),{type:'bar',data:{labels,datasets:[{data,backgroundColor:'rgba(124,58,237,.4)',borderColor:'var(--acc2)',borderWidth:1,borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8fa3b1',font:{size:8}},grid:{display:false}},y:{ticks:{color:'#8fa3b1',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  }
+  // Goals by category donut
+  dc('goalChart');var gc=ge('goalChart');
+  if(gc){
+    var catMap={};
+    S.goals.forEach(g=>{catMap[g.category]=(catMap[g.category]||0)+1;});
+    var cats=Object.keys(catMap);
+    _charts['goalChart']=new Chart(gc.getContext('2d'),{type:'doughnut',data:{labels:cats.map(c=>CAT_EMOJI[c]+' '+c),datasets:[{data:cats.map(c=>catMap[c]),backgroundColor:cats.map(c=>(CAT_COL[c]||'#7c3aed')+'80'),borderColor:cats.map(c=>CAT_COL[c]||'#7c3aed'),borderWidth:2}]},options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#8fa3b1',font:{size:10},boxWidth:12}}}}});
+  }
+  // Habit adherence
+  dc('habAnaChart');var hac=ge('habAnaChart');
+  if(hac&&S.habits.length){
+    _charts['habAnaChart']=new Chart(hac.getContext('2d'),{type:'bar',data:{labels:S.habits.map(h=>h.emoji+' '+h.name.slice(0,10)),datasets:[{label:'30 días %',data:S.habits.map(h=>calcHabitRate(h.id,30)),backgroundColor:S.habits.map(h=>(h.color||'#7c3aed')+'80'),borderColor:S.habits.map(h=>h.color||'#7c3aed'),borderWidth:2,borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8fa3b1',font:{size:9}},grid:{display:false}},y:{min:0,max:100,ticks:{color:'#8fa3b1',font:{size:9},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.04)'}}}}});
+  }
+  // Radar - life balance (uses ALL custom areas)
+  dc('radarChart');var rc=ge('radarChart');
+  if(rc&&S.areas.length>=3){
+    var radarAreas=S.areas.slice(0,10); // max 10 for readability
+    var radarScores=radarAreas.map(function(ar){
+      var gScore=S.goals.filter(function(g){return g.category===ar.id&&g.status==='active';}).length*15;
+      var tScore=S.tasks.filter(function(t){return t.category===ar.id&&t.status==='done';}).length*5;
+      var hScore=S.habits.filter(function(h){return h.category===ar.id;}).reduce(function(s,h){return s+calcHabitRate(h.id,30);},0)/10;
+      return Math.min(100,gScore+tScore+hScore);
+    });
+    var radarColors=radarAreas.map(function(ar){return ar.color||'#7c3aed';});
+    _charts['radarChart']=new Chart(rc.getContext('2d'),{type:'radar',
+      data:{
+        labels:radarAreas.map(function(ar){return ar.emoji+' '+ar.name;}),
+        datasets:[{
+          data:radarScores,
+          backgroundColor:'rgba(124,58,237,.15)',
+          borderColor:'var(--acc2)',
+          borderWidth:2,
+          pointBackgroundColor:radarColors,
+          pointBorderColor:'#fff',
+          pointRadius:5,
+          pointHoverRadius:7
+        }]
+      },
+      options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.label+': '+ctx.raw.toFixed(0)+' pts';}}}},scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},grid:{color:'rgba(255,255,255,.08)'},angleLines:{color:'rgba(255,255,255,.06)'},pointLabels:{color:'var(--soft)',font:{size:10}}}}}
+    });
+  }
+}
+
+// ─── EXPORT / IMPORT ──────────────────────────────────────────
+function expJSON(){
+  var d={v:1,exp:new Date().toISOString(),pass:S.pass,name:S.name,pin:S.pin,googleClientId:S.googleClientId,
+    events:S.events,tasks:S.tasks,goals:S.goals,habits:S.habits,habitLog:S.habitLog,journal:S.journal,patHistory:S.patHistory};
+  var blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='LifeOS_backup_'+todayStr()+'.json';a.click();
+}
+function impJSON(ev){
+  var f=ev.target.files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(e){
+    try{var d=JSON.parse(e.target.result);
+      var keys=['events','tasks','goals','habits','habitLog','journal','patHistory'];
+      keys.forEach(k=>{if(d[k]!==undefined)S[k]=d[k];});
+      if(d.name)S.name=d.name;
+      persist();initApp();toast('✅ Datos importados');
+    }catch(err){toast('Error al importar','#f43f5e');}
+  };r.readAsText(f);
+}
+
+// ─── GOOGLE DRIVE ─────────────────────────────────────────────
+var GD={CID:'',TK:null,SC:'https://www.googleapis.com/auth/drive.file',FN:'lifeos_backup.json',FID:null,autoT:null};
+function drvInit(){
+  if(S.googleClientId)GD.CID=S.googleClientId;
+  var ds=ge('driveStatus');if(ds)ds.textContent=GD.TK?'✅ Conectado':'Sin conectar';
+}
+function drvConnect(){
+  if(!S.googleClientId)return toast('Ingresa tu Client ID primero','#f43f5e');
+  GD.CID=S.googleClientId;
+  if(!window.google||!window.google.accounts){
+    var s=document.createElement('script');
+    s.src='https://accounts.google.com/gsi/client';
+    s.onload=function(){setTimeout(_drvAuth,300);};
+    s.onerror=function(){toast('Error al cargar Google API. Verifica tu conexión.','#f43f5e');};
+    document.head.appendChild(s);
+    toast('Cargando Google API...','#fbbf24');
+  } else {
+    _drvAuth();
+  }
+}
+function _drvAuth(){
+  try{
+    var c=google.accounts.oauth2.initTokenClient({client_id:GD.CID,scope:GD.SC,callback:function(r){
+      if(r.access_token){GD.TK=r.access_token;var ds=ge('driveStatus');if(ds)ds.textContent='✅ Conectado';toast('✅ Google Drive conectado');}
+    }});c.requestAccessToken();
+  }catch(e){toast('Error Drive: '+e.message,'#f43f5e');}
+}
+function drvAutoSave(){
+  clearTimeout(GD.autoT);
+  if(!GD.TK) return; // no token, skip
+  GD.autoT=setTimeout(function(){if(GD.TK)drvSave();},3000);
+}
+function drvSave(){
+  if(!GD.TK)return;
+  var d={v:1,saved:new Date().toISOString(),pass:S.pass,name:S.name,pin:S.pin,googleClientId:S.googleClientId,
+    events:S.events,tasks:S.tasks,goals:S.goals,habits:S.habits,habitLog:S.habitLog,journal:S.journal,patHistory:S.patHistory};
+  var body=JSON.stringify(d);
+  var meta={name:GD.FN,mimeType:'application/json'};
+  function upload(fid){
+    var url=fid?'https://www.googleapis.com/upload/drive/v3/files/'+fid+'?uploadType=media':'https://www.googleapis.com/upload/drive/v3/files?uploadType=media';
+    fetch(url,{method:fid?'PATCH':'POST',headers:{'Authorization':'Bearer '+GD.TK,'Content-Type':'application/json'},body:body})
+    .then(r=>r.json()).then(f=>{GD.FID=f.id;toast('☁️ Guardado en Drive');}).catch(()=>toast('Error al guardar','#f43f5e'));
+  }
+  if(GD.FID){upload(GD.FID);}else{
+    fetch('https://www.googleapis.com/drive/v3/files?q=name%3D%22'+GD.FN+'%22&spaces=drive',{headers:{'Authorization':'Bearer '+GD.TK}})
+    .then(r=>r.json()).then(d2=>{if(d2.files&&d2.files.length){GD.FID=d2.files[0].id;upload(GD.FID);}else{
+      fetch('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Authorization':'Bearer '+GD.TK,'Content-Type':'application/json'},body:JSON.stringify(meta)})
+      .then(r=>r.json()).then(f=>{GD.FID=f.id;upload(GD.FID);});
+    }});
+  }
+}
+function drvLoad(){
+  if(!GD.TK)return toast('Conecta Drive primero','#f43f5e');
+  fetch('https://www.googleapis.com/drive/v3/files?q=name%3D%22'+GD.FN+'%22&spaces=drive',{headers:{'Authorization':'Bearer '+GD.TK}})
+  .then(r=>r.json()).then(d2=>{
+    if(!d2.files||!d2.files.length)return toast('No hay respaldo en Drive','#fbbf24');
+    GD.FID=d2.files[0].id;
+    return fetch('https://www.googleapis.com/drive/v3/files/'+GD.FID+'?alt=media',{headers:{'Authorization':'Bearer '+GD.TK}});
+  }).then(r=>r.json()).then(d3=>{
+    var keys=['events','tasks','goals','habits','habitLog','journal','patHistory'];
+    keys.forEach(k=>{if(d3[k]!==undefined)S[k]=d3[k];});
+    if(d3.name)S.name=d3.name;if(d3.pass)S.pass=d3.pass;if(d3.pin)S.pin=d3.pin;
+    if(d3.googleClientId)S.googleClientId=d3.googleClientId;
+    persist();initApp();toast('📥 Datos restaurados desde Drive');
+  }).catch(()=>toast('Error al cargar','#f43f5e'));
+}
+
+// ─── INIT ──────────────────────────────────────────────────────
+function initApp(){
+  refreshCatMaps();
+  applyTheme(S.theme||'cosmos', S.accent);
+  renderAreaSettings();
+  var sizes={small:'13px',normal:'15px',large:'17px'};
+  if(S.fontSize) document.body.style.fontSize=sizes[S.fontSize]||'15px';
+  setV('sGDrive',S.googleClientId);setV('sName',S.name);
+  var hd=ge('hdrDate');if(hd){var n=new Date();hd.textContent=DAYS[n.getDay()]+' '+n.getDate()+' de '+['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][n.getMonth()];}
+  showPg('pg-d');
+  setTimeout(drvInit,1000);
+}
+document.getElementById('lpass').addEventListener('keypress',function(e){if(e.key==='Enter')doLogin();});
+</script>
+
+<div class="ov" id="mArea" style="display:none" onclick="if(event.target===this)hideM('mArea')">
+<div class="mbox">
+  <div class="mt">🗂️ Área de vida <button class="mc" onclick="hideM('mArea')">✕</button></div>
+  <div class="fr">
+    <div class="fg" style="flex:0 0 70px">
+      <label class="fl">Emoji</label>
+      <input class="fi" id="areaEmoji" placeholder="🧠" style="text-align:center;font-size:22px">
+    </div>
+    <div class="fg">
+      <label class="fl">Nombre *</label>
+      <input class="fi" id="areaName" placeholder="Mental, Espiritual, Social...">
+    </div>
+  </div>
+  <div class="fg">
+    <label class="fl">Color identificador</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+      <input type="color" id="areaColor" value="#7c3aed"
+        style="width:44px;height:44px;border:none;border-radius:10px;cursor:pointer;padding:2px"
+        oninput="ge('areaColorDot').style.background=this.value">
+      <div id="areaColorDot" style="width:28px;height:28px;border-radius:50%;background:#7c3aed;flex-shrink:0"></div>
+      <div>
+        <div style="font-size:12px;font-weight:600">Toca para elegir color</div>
+        <div style="font-size:11px;color:var(--soft)">Aparecerá en gráficas y etiquetas</div>
+      </div>
+    </div>
+  </div>
+  <input type="hidden" id="areaId">
+  <button class="btn bp bfu" onclick="saveArea()">💾 Guardar área</button>
+</div></div>
+
+</body>
+</html>
